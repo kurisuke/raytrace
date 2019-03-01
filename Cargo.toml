@@ -1,0 +1,9 @@
+[package]
+name = "raytrace"
+version = "0.1.0"
+authors = ["Peter Helbing <peter@abulafia.org>"]
+edition = "2018"
+
+[dependencies]
+png = "0.14.0"
+rand = "0.6.5"
