@@ -2,6 +2,8 @@ use crate::ray::Ray;
 use crate::vec3::Vec3;
 use crate::material::Material;
 use crate::sphere::Sphere;
+use crate::boundingbox::BoundingBox;
+use crate::boundingbox;
 
 pub struct HitRecord<'a> {
     pub t: f64,
@@ -19,6 +21,12 @@ impl Hitable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
             Hitable::Sphere(sphere) => sphere.hit(r, t_min, t_max)
+        }
+    }
+
+    fn bounding_box(&self) -> Option<BoundingBox> {
+        match self {
+            Hitable::Sphere(sphere) => sphere.bounding_box()
         }
     }
 }
@@ -39,5 +47,24 @@ impl HitableList {
             }
         }
         hit_record
+    }
+
+    pub fn bounding_box(&self) -> Option<BoundingBox> {
+        let mut bbox : Option<BoundingBox> = None;
+        for item in &self.list {
+            if let Some(temp_bbox) = item.bounding_box() {
+                if bbox.is_some() {
+                    bbox = Some(boundingbox::surrounding_box(&bbox.unwrap(), &temp_bbox));
+                }
+                else {
+                    bbox = Some(temp_bbox);
+                }
+            }
+            else {
+                return None;
+            }
+        }
+
+        bbox
     }
 }

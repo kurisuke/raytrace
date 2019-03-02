@@ -1,3 +1,4 @@
+mod boundingbox;
 mod camera;
 mod hitable;
 mod material;

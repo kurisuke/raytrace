@@ -2,6 +2,7 @@ use crate::hitable::HitRecord;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use crate::material::Material;
+use crate::boundingbox::BoundingBox;
 
 #[derive(Clone)]
 pub struct Sphere {
@@ -48,5 +49,12 @@ impl Sphere {
         else {
             None
         }
+    }
+
+    pub fn bounding_box(&self) -> Option<BoundingBox> {
+        Some(BoundingBox {
+            min: self.center - Vec3::new(self.radius, self.radius, self.radius),
+            max: self.center + Vec3::new(self.radius, self.radius, self.radius),
+        })
     }
 }
