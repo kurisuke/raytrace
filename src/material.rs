@@ -9,6 +9,7 @@ pub struct Scatter {
     pub ray: Ray,
 }
 
+#[derive(Clone)]
 pub enum Material {
     Diffuse {albedo: Vec3},
     Metal {albedo: Vec3},

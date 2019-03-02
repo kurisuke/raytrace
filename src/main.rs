@@ -15,7 +15,7 @@ use rand::prelude::*;
 
 use crate::camera::Camera;
 use crate::vec3::Vec3;
-use crate::hitable::HitableList;
+use crate::hitable::{Hitable,HitableList};
 use crate::sphere::Sphere;
 use crate::material::Material;
 use crate::render::{RenderParams};
@@ -26,6 +26,7 @@ fn main() {
         nx: 200,
         ny: 100,
         ns: 64,
+        nt: 4,
     };
 
     // define the camera
@@ -60,7 +61,7 @@ fn random_scene() -> HitableList {
 
     let mut hl = HitableList {
         list: vec![
-            Box::new(Sphere {
+            Hitable::Sphere( Sphere {
                 center: Vec3::new(0.0, -1000.0, 0.0),
                 radius: 1000.0,
                 material: Material::Diffuse {
@@ -78,7 +79,7 @@ fn random_scene() -> HitableList {
             if (center - Vec3::new(4.0, 0.2, 0.0)).len() > 0.9 {
                 if choose_mat < 0.8 {
                     // diffuse
-                    hl.list.push(Box::new(
+                    hl.list.push(Hitable::Sphere(
                         Sphere {
                             center,
                             radius: 0.2,
@@ -91,7 +92,7 @@ fn random_scene() -> HitableList {
                     ))
                 } else if choose_mat < 0.95 {
                     // metal
-                    hl.list.push(Box::new(
+                    hl.list.push(Hitable::Sphere(
                         Sphere {
                             center,
                             radius: 0.2,
@@ -104,7 +105,7 @@ fn random_scene() -> HitableList {
                     ))
                 } else {
                     // glass
-                    hl.list.push(Box::new(
+                    hl.list.push(Hitable::Sphere(
                         Sphere {
                             center,
                             radius: 0.2,
@@ -118,21 +119,21 @@ fn random_scene() -> HitableList {
         }
     }
 
-    hl.list.push(Box::new(Sphere {
+    hl.list.push(Hitable::Sphere(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Dielectric {
             ref_index: 1.5,
         },
     }));
-    hl.list.push(Box::new(Sphere {
+    hl.list.push(Hitable::Sphere(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Diffuse {
             albedo: Vec3::new(0.4, 0.2, 0.1),
         },
     }));
-    hl.list.push(Box::new(Sphere {
+    hl.list.push(Hitable::Sphere(Sphere {
         center: Vec3::new(4.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Metal {

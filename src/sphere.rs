@@ -1,16 +1,17 @@
-use crate::hitable::{Hitable, HitRecord};
+use crate::hitable::HitRecord;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use crate::material::Material;
 
+#[derive(Clone)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
     pub material: Material,
 }
 
-impl Hitable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+impl Sphere {
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = Vec3::dot(&r.direction, &r.direction);
         let b = Vec3::dot(&oc, &r.direction);
