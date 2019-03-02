@@ -21,8 +21,8 @@ impl Camera {
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         Ray {
             origin: self.origin,
-            direction: self.lower_left + Vec3::mul_s(self.horizontal, u)
-                + Vec3::mul_s(self.vertical, v)
+            direction: self.lower_left + Vec3::mul_s(&self.horizontal, u)
+                + Vec3::mul_s(&self.vertical, v)
         }
     }
 }

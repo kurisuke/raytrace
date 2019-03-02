@@ -8,6 +8,12 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
+    pub fn default() -> Vec3 {
+        Vec3 {
+            e: [0.0, 0.0, 0.0]
+        }
+    }
+
     pub fn new(e0: f64, e1: f64, e2: f64) -> Vec3 {
         Vec3 {
             e: [e0, e1, e2]
@@ -21,35 +27,35 @@ impl Vec3 {
     pub fn g(&self) -> f64 { self.e[1] }
     pub fn b(&self) -> f64 { self.e[2] }
 
-    pub fn mul_s(v: Vec3, s: f64) -> Vec3 {
+    pub fn mul_s(v: &Vec3, s: f64) -> Vec3 {
         Vec3 {
             e: [v.e[0] * s, v.e[1] * s, v.e[2] * s]
         }
     }
 
-    pub fn mul_v(v1: Vec3, v2: Vec3) -> Vec3 {
+    pub fn mul_v(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Vec3 {
             e: [v1.e[0] * v2.e[0], v1.e[1] * v2.e[1], v1.e[2] * v2.e[2]]
         }
     }
 
-    pub fn div_s(v: Vec3, s: f64) -> Vec3 {
+    pub fn div_s(v: &Vec3, s: f64) -> Vec3 {
         Vec3 {
             e: [v.e[0] / s, v.e[1] / s, v.e[2] / s]
         }
     }
 
-    pub fn div_v(v1: Vec3, v2: Vec3) -> Vec3 {
+    pub fn div_v(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Vec3 {
             e: [v1.e[0] / v2.e[0], v1.e[1] / v2.e[1], v1.e[2] / v2.e[2]]
         }
     }
 
-    pub fn dot(v1: Vec3, v2: Vec3) -> f64 {
+    pub fn dot(v1: &Vec3, v2: &Vec3) -> f64 {
         v1.e[0] * v2.e[0] + v1.e[1] * v2.e[1] + v1.e[2] * v2.e[2]
     }
 
-    pub fn cross(v1: Vec3, v2: Vec3) -> Vec3 {
+    pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Vec3 {
             e: [v1.e[1] * v2.e[2] - v1.e[2] * v2.e[1],
                 v1.e[2] * v2.e[0] - v1.e[0] * v2.e[2],
@@ -74,7 +80,7 @@ impl Vec3 {
 
     pub fn normalize01(&self) -> Vec3 {
         let n = self.normalize();
-        Vec3::mul_s(Vec3::new(n.e[0] + 1.0, n.e[1] + 1.0, n.e[2] + 1.0), 0.5)
+        Vec3::mul_s(&Vec3::new(n.e[0] + 1.0, n.e[1] + 1.0, n.e[2] + 1.0), 0.5)
     }
 }
 
@@ -199,7 +205,7 @@ mod tests {
         let v = Vec3::new(3., 4., 5.);
         let s = 3.;
         let v_res = Vec3::new(9., 12., 15.);
-        assert_eq!(v_res, Vec3::mul_s(v, s));
+        assert_eq!(v_res, Vec3::mul_s(&v, s));
     }
 
     #[test]
@@ -207,7 +213,7 @@ mod tests {
         let v = Vec3::new(9., 12., 15.);
         let s = 3.;
         let v_res = Vec3::new(3., 4., 5.);
-        assert_eq!(v_res, Vec3::div_s(v, s));
+        assert_eq!(v_res, Vec3::div_s(&v, s));
     }
 
     #[test]
@@ -215,7 +221,7 @@ mod tests {
         let v1 = Vec3::new(3., 4., 5.);
         let v2 = Vec3::new(2., 3., 4.);
         let v_res = Vec3::new(6., 12., 20.);
-        assert_eq!(v_res, Vec3::mul_v(v1, v2));
+        assert_eq!(v_res, Vec3::mul_v(&v1, &v2));
     }
 
     #[test]
@@ -223,7 +229,7 @@ mod tests {
         let v1 = Vec3::new(6., 12., 20.);
         let v2 = Vec3::new(2., 3., 4.);
         let v_res = Vec3::new(3., 4., 5.);
-        assert_eq!(v_res, Vec3::div_v(v1, v2));
+        assert_eq!(v_res, Vec3::div_v(&v1, &v2));
     }
 
     #[test]
@@ -231,7 +237,7 @@ mod tests {
         let v1 = Vec3::new(1., 2., 3.);
         let v2 = Vec3::new(-7., 8., 9.);
         let s_res = 36.;
-        assert_eq!(s_res, Vec3::dot(v1, v2));
+        assert_eq!(s_res, Vec3::dot(&v1, &v2));
     }
 
     #[test]
@@ -239,7 +245,7 @@ mod tests {
         let v1 = Vec3::new(1., 2., 3.);
         let v2 = Vec3::new(-7., 8., 9.);
         let v_res = Vec3::new(-6., -30., 22.);
-        assert_eq!(v_res, Vec3::cross(v1, v2));
+        assert_eq!(v_res, Vec3::cross(&v1, &v2));
     }
 
     #[test]

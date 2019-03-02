@@ -1,10 +1,12 @@
 use crate::ray::Ray;
 use crate::vec3::Vec3;
+use crate::material::Material;
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub t: f64,
     pub p: Vec3,
     pub n: Vec3,
+    pub material: &'a Material,
 }
 
 pub trait Hitable {
