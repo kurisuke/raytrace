@@ -23,22 +23,22 @@ use crate::render::{RenderParams};
 fn main() {
     // render parameters
     let params = RenderParams {
-        nx: 200,
-        ny: 100,
+        nx: 320,
+        ny: 200,
         ns: 64,
-        nt: 4,
+        nt: 8,
     };
 
     // define the camera
-    let look_from = Vec3::new(8.0, 1.5, 2.5);
-    let look_at = Vec3::new(0.0, -0.5, -2.5);
-    let dist_to_focus = (look_from - look_at).len();
+    let look_from = Vec3::new(13.0, 2.0, 3.0);
+    let look_at = Vec3::new(0.0, 0.0, 0.0);
+    let dist_to_focus = 10.0;
 
     let cam = Camera::new(look_from,
                           look_at,
                           Vec3::new(0.0, 1.0, 0.0),
-                          45.0, params.nx as f64 / params.ny as f64,
-                          0.125, dist_to_focus);
+                          20.0, params.nx as f64 / params.ny as f64,
+                          0.1, dist_to_focus);
 
     // define the world
     let world = random_scene();
