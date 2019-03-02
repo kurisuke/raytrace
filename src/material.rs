@@ -12,7 +12,7 @@ pub struct Scatter {
 #[derive(Clone)]
 pub enum Material {
     Diffuse {albedo: Vec3},
-    Metal {albedo: Vec3},
+    Metal {albedo: Vec3, fuzz: f64},
     Dielectric {ref_index: f64},
 }
 
@@ -22,8 +22,8 @@ impl Material {
         match self {
             Material::Diffuse {albedo} =>
                 scatter_diffuse(rec, &albedo),
-            Material::Metal {albedo} =>
-                scatter_metal(r_in, rec, &albedo),
+            Material::Metal {albedo, fuzz} =>
+                scatter_metal(r_in, rec, &albedo, *fuzz),
             Material::Dielectric {ref_index} =>
                 scatter_dielectric(r_in, rec, *ref_index),
         }
@@ -41,8 +41,8 @@ fn scatter_diffuse(rec: &HitRecord, albedo: &Vec3) -> Option<Scatter> {
     })
 }
 
-fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3) -> Option<Scatter> {
-    let reflected = reflect(&r_in.direction.normalize(), &rec.n);
+fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Option<Scatter> {
+    let reflected = reflect(&r_in.direction.normalize(), &rec.n) + Vec3::mul_s(&random_in_unit_sphere(), fuzz);
     if Vec3::dot(&reflected, &rec.n) > 0.0 {
         Some(Scatter {
             att: albedo.clone(),

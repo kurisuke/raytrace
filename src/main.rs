@@ -100,6 +100,7 @@ fn random_scene() -> HitableList {
                                 albedo: Vec3::new(rng.gen_range(0.5, 1.0),
                                                   rng.gen_range(0.5, 1.0),
                                                   rng.gen_range(0.5, 1.0)),
+                                fuzz: rng.gen_range(0.0, 0.5) * rng.gen_range(0.0, 0.5),
                             },
                         }
                     ))
@@ -138,6 +139,7 @@ fn random_scene() -> HitableList {
         radius: 1.0,
         material: Material::Metal {
             albedo: Vec3::new(0.7, 0.6, 0.5),
+            fuzz: 0.1,
         },
     }));
 
