@@ -50,8 +50,8 @@ fn convert_rgb_u8(v: &Vec3, gamma: f64) -> Vec<u8> {
 }
 
 fn main() {
-    let nx = 1000;
-    let ny = nx / 2;
+    let nx = 200;
+    let ny = 100;
     let ns = 100;
 
     let path = Path::new(r"image.png");
@@ -65,7 +65,10 @@ fn main() {
     let mut data: Vec<u8> = vec![];
 
     // define the camera
-    let cam = Camera::default();
+    let cam = Camera::new(Vec3::new(-2.0, 2.0, 1.0),
+                          Vec3::new(0.0, 0.0, -1.0),
+                          Vec3::new(0.0, 1.0, 0.0),
+                          20.0, nx as f64 / ny as f64);
 
     // define the world
     let world = HitableList {
@@ -89,7 +92,7 @@ fn main() {
                 radius: 0.5,
                 material: Material::Metal {
                     albedo: Vec3::new(0.8, 0.6, 0.2),
-                    },
+                },
             }),
             Box::new(Sphere {
                 center: Vec3::new(-1.0, 0.0, -1.0),
