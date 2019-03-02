@@ -2,7 +2,7 @@ use std::ops::{Neg, Index, IndexMut,
                Add, AddAssign, Sub, SubAssign};
 use std::fmt;
 
-#[derive(Debug,PartialEq,Clone,Copy)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
     e: [f64; 3],
 }
