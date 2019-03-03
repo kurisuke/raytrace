@@ -6,20 +6,22 @@ use crate::vec3::Vec3;
 use std::sync::mpsc;
 use std::sync::mpsc::{Sender, Receiver};
 use std::thread;
+use image::ImageBuffer;
 
 use rand::Rng;
 
 pub struct RenderParams {
-    pub nx: usize,
-    pub ny: usize,
+    pub nx: u32,
+    pub ny: u32,
     pub ns: usize,
     pub nt: usize,
+    pub filename: String,
 }
 
-pub fn render(world: HitableList, cam: Camera, params: RenderParams) -> Vec<u8>
+pub fn render(world: HitableList, cam: Camera, params: RenderParams)
 {
     // output
-    let mut data: Vec<u8> = vec![];
+    let mut data = ImageBuffer::new(params.nx as u32, params.ny as u32);
 
     // RNG for anti-aliasing (average sampling)
     let mut rng = rand::thread_rng();
@@ -40,30 +42,31 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) -> Vec<u8>
 
     let samples_per_thread = params.ns / params.nt;
 
-    for j in (0..params.ny).rev() {
-        for i in 0..params.nx {
-            let mut c = Vec3::new(0.0, 0.0, 0.0);
-            for in_tx in &child_in_tx {
-                for _ in 0..samples_per_thread {
-                    let u = (i as f64 + rng.gen::<f64>()) / params.nx as f64;
-                    let v = (j as f64 + rng.gen::<f64>()) / params.ny as f64;
-                    let r = cam.get_ray(u, v);
-                    in_tx.send(Job::Data(r)).unwrap();
-                }
+    for (i, j, pixel) in data.enumerate_pixels_mut() {
+        // invert y coordinate
+        let j = params.ny - j - 1;
+        
+        let mut c = Vec3::new(0.0, 0.0, 0.0);
+        for in_tx in &child_in_tx {
+            for _ in 0..samples_per_thread {
+                let u = (i as f64 + rng.gen::<f64>()) / params.nx as f64;
+                let v = (j as f64 + rng.gen::<f64>()) / params.ny as f64;
+                let r = cam.get_ray(u, v);
+                in_tx.send(Job::Data(r)).unwrap();
             }
-
-            let mut count_output = 0;
-            for cs in &out_rx {
-                c += cs;
-                count_output += 1;
-                if count_output == params.ns {
-                    break;
-                }
-            }
-
-            let c = Vec3::div_s(&c, params.ns as f64);
-            data.extend(convert_rgb_u8(&c, 2.0));
         }
+
+        let mut count_output = 0;
+        for cs in &out_rx {
+            c += cs;
+            count_output += 1;
+            if count_output == params.ns {
+                break;
+            }
+        }
+
+        let c = Vec3::div_s(&c, params.ns as f64);
+        *pixel = image::Rgb(convert_rgb_u8(&c, 2.0));
     }
 
     for in_tx in &child_in_tx {
@@ -74,7 +77,7 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) -> Vec<u8>
         let _ = child.join();
     }
 
-    data
+    data.save(&params.filename).unwrap();
 }
 
 enum Job {
@@ -118,8 +121,8 @@ fn color(r: Ray, world: &HitableList, depth: u32) -> Vec3 {
     }
 }
 
-fn convert_rgb_u8(v: &Vec3, gamma: f64) -> Vec<u8> {
-    vec![(255.99 * v[0].powf(1.0 / gamma)) as u8,
-         (255.99 * v[1].powf(1.0 / gamma)) as u8,
-         (255.99 * v[2].powf(1.0 / gamma)) as u8]
+fn convert_rgb_u8(v: &Vec3, gamma: f64) -> [u8; 3] {
+    [(255.99 * v[0].powf(1.0 / gamma)) as u8,
+        (255.99 * v[1].powf(1.0 / gamma)) as u8,
+        (255.99 * v[2].powf(1.0 / gamma)) as u8]
 }

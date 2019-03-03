@@ -13,7 +13,6 @@ use std::path::Path;
 use std::fs::File;
 use std::io::BufWriter;
 
-use png::HasParameters;
 use rand::prelude::*;
 
 use crate::camera::Camera;
@@ -39,10 +38,11 @@ fn main() {
 
     // render parameters
     let params = RenderParams {
-        nx: clap_matches.value_of("WIDTH").unwrap_or("200").parse::<usize>().unwrap(),
-        ny: clap_matches.value_of("HEIGHT").unwrap_or("100").parse::<usize>().unwrap(),
+        nx: clap_matches.value_of("WIDTH").unwrap_or("200").parse::<u32>().unwrap(),
+        ny: clap_matches.value_of("HEIGHT").unwrap_or("100").parse::<u32>().unwrap(),
         ns: 64,
         nt: 8,
+        filename: String::from("image.png"),
     };
 
     // define the camera
@@ -63,17 +63,9 @@ fn main() {
         list: vec![Hitable::BvhNode(bvhnode::BvhNode::new(world.list))]
     };
 
-    let path = Path::new(r"image.png");
-    let file = File::create(path).unwrap();
-    let ref mut w = BufWriter::new(file);
-
-    let mut encoder = png::Encoder::new(w, params.nx as u32, params.ny as u32);
-    encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
-    let mut writer = encoder.write_header().unwrap();
-
-    let data = render::render(world, cam, params);
-
-    writer.write_image_data(&data).unwrap(); // Save
+    let nx = params.nx as u32;
+    let ny = params.ny as u32;
+    render::render(world, cam, params);
 }
 
 fn random_scene() -> HitableList {

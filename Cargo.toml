@@ -5,6 +5,6 @@ authors = ["Peter Helbing <peter@abulafia.org>"]
 edition = "2018"
 
 [dependencies]
-png = "0.14.0"
+image = "0.21.0"
 rand = "0.6.5"
 clap = "2.32.0"

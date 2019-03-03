@@ -2,6 +2,8 @@ use crate::vec3::Vec3;
 
 use rand::{Rng, thread_rng};
 
+type PixelRgb = [u8; 3];
+
 #[derive(Clone)]
 pub enum Texture {
     Constant {color: Vec3},
@@ -24,7 +26,7 @@ impl Texture {
             Texture::PerlinNoise {perlin, scale} => {
                 Vec3::mul_s(&Vec3::new(1.0, 1.0, 1.0),
                             0.5 * (1.0 + (scale * p.z() + 10.0 * perlin.turb(p, 7)).sin()))
-            }
+            },
         }
     }
 }
