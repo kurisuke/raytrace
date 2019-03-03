@@ -6,12 +6,12 @@ mod material;
 mod ray;
 mod render;
 mod sphere;
+mod texture;
 mod vec3;
 
 use std::path::Path;
 use std::fs::File;
 use std::io::BufWriter;
-use std::time::Instant;
 
 use png::HasParameters;
 use rand::prelude::*;
@@ -22,12 +22,25 @@ use crate::hitable::{Hitable,HitableList};
 use crate::sphere::Sphere;
 use crate::material::Material;
 use crate::render::{RenderParams};
+use crate::texture::{Perlin, Texture};
 
 fn main() {
+    // command line argument
+    let clap_matches = clap::App::new("raytrace")
+        .version("0.1")
+        .author("Peter Helbing <peter@abulafia.org>")
+        .arg(clap::Arg::with_name("WIDTH")
+            .help("width of the resulting image")
+            .index(1))
+        .arg(clap::Arg::with_name("HEIGHT")
+            .help("height of the resulting image")
+            .index(2))
+        .get_matches();
+
     // render parameters
     let params = RenderParams {
-        nx: 200,
-        ny: 100,
+        nx: clap_matches.value_of("WIDTH").unwrap_or("200").parse::<usize>().unwrap(),
+        ny: clap_matches.value_of("HEIGHT").unwrap_or("100").parse::<usize>().unwrap(),
         ns: 64,
         nt: 8,
     };
@@ -44,7 +57,8 @@ fn main() {
                           0.1, dist_to_focus);
 
     // define the world
-    let world = random_scene();
+    // let world = random_scene();
+    let world = two_perlin_spheres();
     let world = HitableList {
         list: vec![Hitable::BvhNode(bvhnode::BvhNode::new(world.list))]
     };
@@ -71,7 +85,14 @@ fn random_scene() -> HitableList {
                 center: Vec3::new(0.0, -1000.0, 0.0),
                 radius: 1000.0,
                 material: Material::Diffuse {
-                    albedo: Vec3::new(0.5, 0.5, 0.5),
+                    albedo: Texture::Checker {
+                        odd: Box::new(Texture::Constant {
+                            color: Vec3::new(0.2, 0.3, 0.1),
+                        }),
+                        even: Box::new(Texture::Constant {
+                            color: Vec3::new(0.9, 0.9, 0.9),
+                        }),
+                    },
                 },
             })
         ]
@@ -90,9 +111,10 @@ fn random_scene() -> HitableList {
                             center,
                             radius: 0.2,
                             material: Material::Diffuse {
-                                albedo: Vec3::new(rng.gen::<f64>() * rng.gen::<f64>(),
-                                                  rng.gen::<f64>() * rng.gen::<f64>(),
-                                                  rng.gen::<f64>() * rng.gen::<f64>()),
+                                albedo: Texture::Constant
+                                    { color: Vec3::new(rng.gen::<f64>() * rng.gen::<f64>(),
+                                                       rng.gen::<f64>() * rng.gen::<f64>(),
+                                                       rng.gen::<f64>() * rng.gen::<f64>()), },
                             },
                         }
                     ))
@@ -137,7 +159,7 @@ fn random_scene() -> HitableList {
         center: Vec3::new(-4.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Diffuse {
-            albedo: Vec3::new(0.4, 0.2, 0.1),
+            albedo: Texture::Constant { color: Vec3::new(0.4, 0.2, 0.1) },
         },
     }));
     hl.list.push(Hitable::Sphere(Sphere {
@@ -150,4 +172,31 @@ fn random_scene() -> HitableList {
     }));
 
     hl
+}
+
+fn two_perlin_spheres() -> HitableList {
+    let text1 = Texture::PerlinNoise {
+        perlin: Perlin::new(),
+        scale: 5.0,
+    };
+    let text2 = text1.clone();
+
+    HitableList {
+        list : vec![
+            Hitable::Sphere(Sphere {
+                center: Vec3::new(0.0, -1000.0, 0.0),
+                radius: 1000.0,
+                material: Material::Diffuse {
+                    albedo: text1,
+                }
+            }),
+            Hitable::Sphere(Sphere {
+                center: Vec3::new(0.0, 2.0, 0.0),
+                radius: 2.0,
+                material: Material::Diffuse {
+                    albedo: text2,
+                }
+            }),
+        ]
+    }
 }

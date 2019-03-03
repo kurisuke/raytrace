@@ -1,5 +1,6 @@
 use crate::hitable::HitRecord;
 use crate::ray::Ray;
+use crate::texture::Texture;
 use crate::vec3::Vec3;
 
 use rand::Rng;
@@ -11,7 +12,7 @@ pub struct Scatter {
 
 #[derive(Clone)]
 pub enum Material {
-    Diffuse {albedo: Vec3},
+    Diffuse {albedo: Texture},
     Metal {albedo: Vec3, fuzz: f64},
     Dielectric {ref_index: f64},
 }
@@ -30,10 +31,10 @@ impl Material {
     }
 }
 
-fn scatter_diffuse(rec: &HitRecord, albedo: &Vec3) -> Option<Scatter> {
+fn scatter_diffuse(rec: &HitRecord, albedo: &Texture) -> Option<Scatter> {
     let target = rec.p + rec.n + random_in_unit_sphere();
     Some(Scatter {
-        att: albedo.clone(),
+        att: albedo.value(0.0, 0.0, &rec.p),
         ray: Ray {
             origin: rec.p,
             direction: target - rec.p,
