@@ -42,6 +42,12 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams)
 
     let samples_per_thread = params.ns / params.nt;
 
+    let mut pbr = pbr::ProgressBar::new((data.width() * data.height()) as u64);
+    pbr.show_percent = true;
+    pbr.show_time_left = true;
+    pbr.show_counter = false;
+    pbr.set_max_refresh_rate(Some(std::time::Duration::from_millis(500)));
+
     for (i, j, pixel) in data.enumerate_pixels_mut() {
         // invert y coordinate
         let j = params.ny - j - 1;
@@ -67,6 +73,7 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams)
 
         let c = Vec3::div_s(&c, params.ns as f64);
         *pixel = image::Rgb(convert_rgb_u8(&c, 2.0));
+        pbr.inc();
     }
 
     for in_tx in &child_in_tx {
@@ -78,6 +85,7 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams)
     }
 
     data.save(&params.filename).unwrap();
+    pbr.finish_println("done");
 }
 
 enum Job {
