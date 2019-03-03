@@ -100,24 +100,19 @@ fn render_job(world: HitableList, in_rx: mpsc::Receiver<Job>, out_tx: mpsc::Send
 fn color(r: Ray, world: &HitableList, depth: u32) -> Vec3 {
     if let Some(rec) = world.hit(&r, 0.001, std::f64::MAX) {
         if depth < 32 {
+            let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
             if let Some(s) = rec.material.scatter(&r, &rec) {
-                Vec3::mul_v(&color(s.ray, world, depth + 1), &s.att)
+                emitted + Vec3::mul_v(&color(s.ray, world, depth + 1), &s.att)
             }
             else {
-                Vec3::default()
+                emitted
             }
         }
         else {
             Vec3::default()
         }
     } else {
-        // background
-
-        let unit_direction = r.direction.normalize();
-        // get y component, scale to 0..1
-        let t = 0.5 * (unit_direction.y() + 1.0);
-        // get a color blend between white and light blue
-        Vec3::mul_s(&Vec3::new(1.0, 1.0, 1.0), 1.0 - t) + Vec3::mul_s(&Vec3::new(0.5, 0.7, 1.0), t)
+        Vec3::new(0.0, 0.0, 0.0)
     }
 }
 

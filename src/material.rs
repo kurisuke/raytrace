@@ -15,6 +15,7 @@ pub enum Material {
     Diffuse {albedo: Texture},
     Metal {albedo: Vec3, fuzz: f64},
     Dielectric {ref_index: f64},
+    DiffuseLight {emit: Texture},
 }
 
 impl Material {
@@ -27,6 +28,17 @@ impl Material {
                 scatter_metal(r_in, rec, &albedo, *fuzz),
             Material::Dielectric {ref_index} =>
                 scatter_dielectric(r_in, rec, *ref_index),
+            Material::DiffuseLight {emit} =>
+                None
+        }
+    }
+
+    pub fn emitted(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
+        match self {
+            Material::DiffuseLight {emit} =>
+                emit.value(u, v, p),
+            _ =>
+                Vec3::new(0.0, 0.0, 0.0),
         }
     }
 }
