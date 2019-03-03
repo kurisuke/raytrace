@@ -4,6 +4,7 @@ mod camera;
 mod hitable;
 mod material;
 mod ray;
+mod rect;
 mod render;
 mod sphere;
 mod texture;
@@ -22,6 +23,7 @@ use crate::sphere::Sphere;
 use crate::material::Material;
 use crate::render::{RenderParams};
 use crate::texture::{Perlin, Texture};
+use crate::rect::XYRect;
 
 fn main() {
     // command line argument
@@ -34,14 +36,17 @@ fn main() {
         .arg(clap::Arg::with_name("HEIGHT")
             .help("height of the resulting image")
             .index(2))
+        .arg(clap::Arg::with_name("SPP")
+            .help("samples (rays) per pixel")
+            .index(3))
         .get_matches();
 
     // render parameters
     let params = RenderParams {
         nx: clap_matches.value_of("WIDTH").unwrap_or("200").parse::<u32>().unwrap(),
         ny: clap_matches.value_of("HEIGHT").unwrap_or("100").parse::<u32>().unwrap(),
-        ns: 64,
-        nt: 8,
+        ns: clap_matches.value_of("SPP").unwrap_or("64").parse::<usize>().unwrap(),
+        nt: num_cpus::get(),
         filename: String::from("image.png"),
     };
 
@@ -53,7 +58,7 @@ fn main() {
     let cam = Camera::new(look_from,
                           look_at,
                           Vec3::new(0.0, 1.0, 0.0),
-                          20.0, params.nx as f64 / params.ny as f64,
+                          40.0, params.nx as f64 / params.ny as f64,
                           0.1, dist_to_focus);
 
     // define the world
@@ -191,6 +196,21 @@ fn two_perlin_spheres() -> HitableList {
                 radius: 2.0,
                 material: Material::Diffuse {
                     albedo: text2,
+                }
+            }),
+            Hitable::XYRect(XYRect {
+                x: (3.0, 5.0),
+                y: (1.0, 3.0),
+                k: -2.0,
+                material: Material::DiffuseLight {
+                    emit: Texture::Constant { color: Vec3::new(4.0, 4.0, 4.0) },
+                }
+            }),
+            Hitable::Sphere(Sphere {
+                center: Vec3::new(0.0, 7.0, 0.0),
+                radius: 2.0,
+                material: Material::DiffuseLight {
+                    emit: Texture::Constant { color: Vec3::new(4.0, 4.0, 4.0) },
                 }
             }),
         ]

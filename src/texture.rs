@@ -1,6 +1,6 @@
 use crate::vec3::Vec3;
 
-use image::{ImageBuffer, Pixel, RgbImage};
+use image::{ImageBuffer, RgbImage};
 use rand::{Rng, thread_rng};
 
 #[derive(Clone)]
