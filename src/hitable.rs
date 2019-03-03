@@ -4,6 +4,7 @@ use crate::material::Material;
 use crate::sphere::Sphere;
 use crate::boundingbox::BoundingBox;
 use crate::boundingbox;
+use crate::bvhnode::BvhNode;
 
 pub struct HitRecord<'a> {
     pub t: f64,
@@ -14,19 +15,22 @@ pub struct HitRecord<'a> {
 
 #[derive(Clone)]
 pub enum Hitable {
+    BvhNode(BvhNode),
     Sphere(Sphere),
 }
 
 impl Hitable {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         match self {
-            Hitable::Sphere(sphere) => sphere.hit(r, t_min, t_max)
+            Hitable::Sphere(sphere) => sphere.hit(r, t_min, t_max),
+            Hitable::BvhNode(bvh_node) => bvh_node.hit(r, t_min, t_max)
         }
     }
 
-    fn bounding_box(&self) -> Option<BoundingBox> {
+    pub fn bounding_box(&self) -> Option<BoundingBox> {
         match self {
-            Hitable::Sphere(sphere) => sphere.bounding_box()
+            Hitable::Sphere(sphere) => sphere.bounding_box(),
+            Hitable::BvhNode(bvh_node) => bvh_node.bounding_box()
         }
     }
 }

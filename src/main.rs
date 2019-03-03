@@ -1,4 +1,5 @@
 mod boundingbox;
+mod bvhnode;
 mod camera;
 mod hitable;
 mod material;
@@ -10,6 +11,7 @@ mod vec3;
 use std::path::Path;
 use std::fs::File;
 use std::io::BufWriter;
+use std::time::Instant;
 
 use png::HasParameters;
 use rand::prelude::*;
@@ -24,8 +26,8 @@ use crate::render::{RenderParams};
 fn main() {
     // render parameters
     let params = RenderParams {
-        nx: 320,
-        ny: 200,
+        nx: 200,
+        ny: 100,
         ns: 64,
         nt: 8,
     };
@@ -43,6 +45,9 @@ fn main() {
 
     // define the world
     let world = random_scene();
+    let world = HitableList {
+        list: vec![Hitable::BvhNode(bvhnode::BvhNode::new(world.list))]
+    };
 
     let path = Path::new(r"image.png");
     let file = File::create(path).unwrap();
