@@ -1,14 +1,14 @@
 use crate::vec3::Vec3;
 
+use image::{ImageBuffer, Pixel, RgbImage};
 use rand::{Rng, thread_rng};
-
-type PixelRgb = [u8; 3];
 
 #[derive(Clone)]
 pub enum Texture {
     Constant {color: Vec3},
     Checker {odd: Box<Texture>, even: Box<Texture>},
     PerlinNoise {perlin: Perlin, scale: f64},
+    Image {image: RgbImage},
 }
 
 impl Texture {
@@ -27,6 +27,9 @@ impl Texture {
                 Vec3::mul_s(&Vec3::new(1.0, 1.0, 1.0),
                             0.5 * (1.0 + (scale * p.z() + 10.0 * perlin.turb(p, 7)).sin()))
             },
+            Texture::Image {image} => {
+                image_texture_value(image, u, v, p)
+            }
         }
     }
 }
@@ -119,4 +122,22 @@ fn perlin_interpolate(c: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
         }
     }
     acc
+}
+
+fn image_texture_value(image: &RgbImage, u: f64, v: f64, p: &Vec3) -> Vec3 {
+    let i = (u * image.width() as f64) as i32;
+    let j = ((1.0 - v) * image.height() as f64 - 0.001) as i32;
+
+    // boundaries
+    let i = if i < 0 {0} else {i};
+    let j = if j < 0 {0} else {j};
+    let i = if i > image.width() as i32 - 1 {image.width() - 1} else {i as u32};
+    let j = if j > image.height() as i32 - 1 {image.height() - 1} else {j as u32};
+
+    let pixel = image.get_pixel(i, j);
+    Vec3::new(
+        pixel[0] as f64 / 255.0,
+        pixel[1] as f64 / 255.0,
+        pixel[2] as f64 / 255.0,
+    )
 }

@@ -45,7 +45,7 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams)
     for (i, j, pixel) in data.enumerate_pixels_mut() {
         // invert y coordinate
         let j = params.ny - j - 1;
-        
+
         let mut c = Vec3::new(0.0, 0.0, 0.0);
         for in_tx in &child_in_tx {
             for _ in 0..samples_per_thread {

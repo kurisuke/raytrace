@@ -171,7 +171,11 @@ fn two_perlin_spheres() -> HitableList {
         perlin: Perlin::new(),
         scale: 5.0,
     };
-    let text2 = text1.clone();
+
+    let img = image::open("res/earth.jpg").unwrap();
+    let text2 = Texture::Image {
+        image: img.as_rgb8().unwrap().clone(),
+    };
 
     HitableList {
         list : vec![

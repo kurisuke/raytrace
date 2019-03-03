@@ -23,10 +23,14 @@ impl Sphere {
             // first solution
             let t = (-b - d.sqrt()) / a;
             if t < t_max && t > t_min {
+                let n = Vec3::div_s(&(r.point(t) - self.center), self.radius);
+                let (u, v) = sphere_uv(&n);
                 Some(HitRecord {
                     t,
                     p: r.point(t),
-                    n: Vec3::div_s(&(r.point(t) - self.center), self.radius),
+                    n,
+                    u,
+                    v,
                     material: &self.material
                 })
             }
@@ -34,10 +38,14 @@ impl Sphere {
                 // second solution
                 let t = (-b + d.sqrt()) / a;
                 if t < t_max && t > t_min {
+                    let n = Vec3::div_s(&(r.point(t) - self.center), self.radius);
+                    let (u, v) = sphere_uv(&n);
                     Some(HitRecord {
                         t,
                         p: r.point(t),
-                        n: Vec3::div_s(&(r.point(t) - self.center), self.radius),
+                        n,
+                        u,
+                        v,
                         material: &self.material,
                     })
                 }
@@ -57,4 +65,12 @@ impl Sphere {
             max: self.center + Vec3::new(self.radius, self.radius, self.radius),
         })
     }
+}
+
+fn sphere_uv(p: &Vec3) -> (f64, f64) {
+    let phi = p.z().atan2(p.x());
+    let theta = p.y().asin();
+    let u = 1.0 - (phi + std::f64::consts::PI) / (2.0 * std::f64::consts::PI);
+    let v = (theta + std::f64::consts::FRAC_PI_2) / std::f64::consts::PI;
+    (u, v)
 }

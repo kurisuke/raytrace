@@ -10,6 +10,8 @@ pub struct HitRecord<'a> {
     pub t: f64,
     pub p: Vec3,
     pub n: Vec3,
+    pub u: f64,
+    pub v: f64,
     pub material: &'a Material,
 }
 

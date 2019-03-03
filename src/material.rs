@@ -34,7 +34,7 @@ impl Material {
 fn scatter_diffuse(rec: &HitRecord, albedo: &Texture) -> Option<Scatter> {
     let target = rec.p + rec.n + random_in_unit_sphere();
     Some(Scatter {
-        att: albedo.value(0.0, 0.0, &rec.p),
+        att: albedo.value(rec.u, rec.v, &rec.p),
         ray: Ray {
             origin: rec.p,
             direction: target - rec.p,
