@@ -1,9 +1,10 @@
 use crate::camera::Camera;
-use crate::hitable::HitableList;
+use crate::hitable::{Hitable, HitableList};
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
 use image::ImageBuffer;
+use std::sync::Arc;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
@@ -30,10 +31,11 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
     let mut child_in_tx = vec![];
     let mut child_threads = vec![];
     let (out_tx, out_rx): (Sender<Vec3>, Receiver<Vec3>) = mpsc::channel();
+    let world_arc = Arc::new(world);
     for _ in 0..params.nt {
         let (in_tx, in_rx): (Sender<Job>, Receiver<Job>) = mpsc::channel();
         let thread_out_tx = out_tx.clone();
-        let world_c = world.clone();
+        let world_c = world_arc.clone();
         let child = thread::spawn(move || {
             render_job(world_c, in_rx, thread_out_tx);
         });
@@ -99,7 +101,7 @@ enum Job {
     End,
 }
 
-fn render_job(world: HitableList, in_rx: mpsc::Receiver<Job>, out_tx: mpsc::Sender<Vec3>) {
+fn render_job(world: Arc<HitableList>, in_rx: mpsc::Receiver<Job>, out_tx: mpsc::Sender<Vec3>) {
     for j in in_rx {
         match j {
             Job::Data(rs) => {

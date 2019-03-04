@@ -16,41 +16,20 @@ pub struct HitRecord<'a> {
     pub material: &'a Material,
 }
 
-#[derive(Clone)]
-pub enum Hitable {
-    BvhNode(BvhNode),
-    Sphere(Sphere),
-    Rect(Rect),
-    Cuboid(Cuboid),
+pub trait Hitable {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn bounding_box(&self) -> Option<BoundingBox>;
 }
 
-impl Hitable {
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        match self {
-            Hitable::BvhNode(bvh_node) => bvh_node.hit(r, t_min, t_max),
-            Hitable::Sphere(sphere) => sphere.hit(r, t_min, t_max),
-            Hitable::Rect(rect) => rect.hit(r, t_min, t_max),
-            Hitable::Cuboid(cuboid) => cuboid.hit(r, t_min, t_max),
-        }
-    }
-
-    pub fn bounding_box(&self) -> Option<BoundingBox> {
-        match self {
-            Hitable::BvhNode(bvh_node) => bvh_node.bounding_box(),
-            Hitable::Sphere(sphere) => sphere.bounding_box(),
-            Hitable::Rect(rect) => rect.bounding_box(),
-            Hitable::Cuboid(cuboid) => cuboid.bounding_box(),
-        }
-    }
-}
-
-#[derive(Clone)]
 pub struct HitableList {
-    pub list: Vec<Hitable>,
+    pub list: Vec<Box<dyn Hitable>>,
 }
 
-impl HitableList {
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+unsafe impl Sync for HitableList {}
+unsafe impl Send for HitableList {}
+
+impl Hitable for HitableList {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;
         for item in &self.list {
@@ -62,7 +41,7 @@ impl HitableList {
         hit_record
     }
 
-    pub fn bounding_box(&self) -> Option<BoundingBox> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         let mut bbox: Option<BoundingBox> = None;
         for item in &self.list {
             if let Some(temp_bbox) = item.bounding_box() {

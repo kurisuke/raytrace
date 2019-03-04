@@ -1,5 +1,5 @@
 use crate::boundingbox::BoundingBox;
-use crate::hitable::HitRecord;
+use crate::hitable::{Hitable,HitRecord};
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
@@ -11,8 +11,8 @@ pub struct Sphere {
     pub material: Material,
 }
 
-impl Sphere {
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+impl Hitable for Sphere {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = Vec3::dot(&r.direction, &r.direction);
         let b = Vec3::dot(&oc, &r.direction);
@@ -56,7 +56,7 @@ impl Sphere {
         }
     }
 
-    pub fn bounding_box(&self) -> Option<BoundingBox> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         Some(BoundingBox {
             min: self.center - Vec3::new(self.radius, self.radius, self.radius),
             max: self.center + Vec3::new(self.radius, self.radius, self.radius),

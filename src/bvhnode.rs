@@ -5,7 +5,6 @@ use crate::ray::Ray;
 
 use rand::Rng;
 
-#[derive(Clone)]
 pub struct BvhNode {
     left: Box<Hitable>,
     right: Option<Box<Hitable>>,
@@ -13,7 +12,7 @@ pub struct BvhNode {
 }
 
 impl BvhNode {
-    pub fn new(items: Vec<Hitable>) -> BvhNode {
+    pub fn new(items: Vec<Box<dyn Hitable>>) -> BvhNode {
         let mut rng = rand::thread_rng();
         let mut sorted_items = items;
 
@@ -39,7 +38,7 @@ impl BvhNode {
         }
 
         if sorted_items.len() == 1 {
-            let left = Box::new(sorted_items.pop().unwrap());
+            let left = sorted_items.pop().unwrap();
             let bbox = left.bounding_box().unwrap();
             BvhNode {
                 left,
@@ -47,8 +46,8 @@ impl BvhNode {
                 bbox,
             }
         } else if sorted_items.len() == 2 {
-            let right = Box::new(sorted_items.pop().unwrap());
-            let left = Box::new(sorted_items.pop().unwrap());
+            let right = sorted_items.pop().unwrap();
+            let left = sorted_items.pop().unwrap();
             let bbox = boundingbox::surrounding_box(
                 &left.bounding_box().unwrap(),
                 &right.bounding_box().unwrap(),
@@ -69,14 +68,16 @@ impl BvhNode {
                 &right.bounding_box().unwrap(),
             );
             BvhNode {
-                left: Box::new(Hitable::BvhNode(left)),
-                right: Some(Box::new(Hitable::BvhNode(right))),
+                left: Box::new(left),
+                right: Some(Box::new(right)),
                 bbox,
             }
         }
     }
+}
 
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+impl Hitable for BvhNode {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         if self.bbox.hit(r, t_min, t_max) {
             if self.right.is_none() {
                 self.left.hit(&r, t_min, t_max)
@@ -102,7 +103,7 @@ impl BvhNode {
         }
     }
 
-    pub fn bounding_box(&self) -> Option<BoundingBox> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         Some(self.bbox.clone())
     }
 }

@@ -93,7 +93,7 @@ fn main() {
     // let world = two_perlin_spheres();
     let world = cornell_box_base();
     let world = HitableList {
-        list: vec![Hitable::BvhNode(bvhnode::BvhNode::new(world.list))],
+        list: vec![Box::new(bvhnode::BvhNode::new(world.list))],
     };
 
     render::render(world, cam_cornell, params);
@@ -103,7 +103,7 @@ fn random_scene() -> HitableList {
     let mut rng = rand::thread_rng();
 
     let mut hl = HitableList {
-        list: vec![Hitable::Sphere(Sphere {
+        list: vec![Box::new(Sphere {
             center: Vec3::new(0.0, -1000.0, 0.0),
             radius: 1000.0,
             material: Material::Diffuse {
@@ -130,7 +130,7 @@ fn random_scene() -> HitableList {
             if (center - Vec3::new(4.0, 0.2, 0.0)).len() > 0.9 {
                 if choose_mat < 0.8 {
                     // diffuse
-                    hl.list.push(Hitable::Sphere(Sphere {
+                    hl.list.push(Box::new(Sphere {
                         center,
                         radius: 0.2,
                         material: Material::Diffuse {
@@ -145,7 +145,7 @@ fn random_scene() -> HitableList {
                     }))
                 } else if choose_mat < 0.95 {
                     // metal
-                    hl.list.push(Hitable::Sphere(Sphere {
+                    hl.list.push(Box::new(Sphere {
                         center,
                         radius: 0.2,
                         material: Material::Metal {
@@ -159,7 +159,7 @@ fn random_scene() -> HitableList {
                     }))
                 } else {
                     // glass
-                    hl.list.push(Hitable::Sphere(Sphere {
+                    hl.list.push(Box::new(Sphere {
                         center,
                         radius: 0.2,
                         material: Material::Dielectric { ref_index: 1.5 },
@@ -169,12 +169,12 @@ fn random_scene() -> HitableList {
         }
     }
 
-    hl.list.push(Hitable::Sphere(Sphere {
+    hl.list.push(Box::new(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Dielectric { ref_index: 1.5 },
     }));
-    hl.list.push(Hitable::Sphere(Sphere {
+    hl.list.push(Box::new(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Diffuse {
@@ -183,7 +183,7 @@ fn random_scene() -> HitableList {
             },
         },
     }));
-    hl.list.push(Hitable::Sphere(Sphere {
+    hl.list.push(Box::new(Sphere {
         center: Vec3::new(4.0, 1.0, 0.0),
         radius: 1.0,
         material: Material::Metal {
@@ -208,17 +208,17 @@ fn two_perlin_spheres() -> HitableList {
 
     HitableList {
         list: vec![
-            Hitable::Sphere(Sphere {
+            Box::new(Sphere {
                 center: Vec3::new(0.0, -1000.0, 0.0),
                 radius: 1000.0,
                 material: Material::Diffuse { albedo: text1 },
             }),
-            Hitable::Sphere(Sphere {
+            Box::new(Sphere {
                 center: Vec3::new(0.0, 2.0, 0.0),
                 radius: 2.0,
                 material: Material::Diffuse { albedo: text2 },
             }),
-            Hitable::Rect(Rect {
+            Box::new(Rect {
                 a: Axes::XY {
                     x: (3.0, 5.0),
                     y: (1.0, 3.0),
@@ -231,7 +231,7 @@ fn two_perlin_spheres() -> HitableList {
                     },
                 },
             }),
-            Hitable::Sphere(Sphere {
+            Box::new(Sphere {
                 center: Vec3::new(0.0, 7.0, 0.0),
                 radius: 2.0,
                 material: Material::DiffuseLight {
@@ -268,7 +268,7 @@ fn cornell_box_base() -> HitableList {
 
     HitableList {
         list: vec![
-            Hitable::Rect(Rect {
+            Box::new(Rect {
                 a: Axes::YZ {
                     x: 555.0,
                     y: (0.0, 555.0),
@@ -277,7 +277,7 @@ fn cornell_box_base() -> HitableList {
                 flip_normal: true,
                 material: green,
             }),
-            Hitable::Rect(Rect {
+            Box::new(Rect {
                 a: Axes::YZ {
                     x: 0.0,
                     y: (0.0, 555.0),
@@ -286,7 +286,7 @@ fn cornell_box_base() -> HitableList {
                 flip_normal: false,
                 material: red,
             }),
-            Hitable::Rect(Rect {
+            Box::new(Rect {
                 a: Axes::XZ {
                     x: (213.0, 343.0),
                     y: 554.0,
@@ -295,7 +295,7 @@ fn cornell_box_base() -> HitableList {
                 flip_normal: false,
                 material: light,
             }),
-            Hitable::Rect(Rect {
+            Box::new(Rect {
                 a: Axes::XZ {
                     x: (0.0, 555.0),
                     y: 555.0,
@@ -304,7 +304,7 @@ fn cornell_box_base() -> HitableList {
                 flip_normal: true,
                 material: white.clone(),
             }),
-            Hitable::Rect(Rect {
+            Box::new(Rect {
                 a: Axes::XZ {
                     x: (0.0, 555.0),
                     y: 0.0,
@@ -313,7 +313,7 @@ fn cornell_box_base() -> HitableList {
                 flip_normal: false,
                 material: white.clone(),
             }),
-            Hitable::Rect(Rect {
+            Box::new(Rect {
                 a: Axes::XY {
                     x: (0.0, 555.0),
                     y: (0.0, 555.0),
@@ -323,8 +323,8 @@ fn cornell_box_base() -> HitableList {
                 material: white.clone(),
             }),
             // two blocks
-            Hitable::Cuboid(Cuboid::new(Vec3::new(130.0, 0.0, 65.0), Vec3::new(295.0, 165.0, 230.0), white.clone())),
-            Hitable::Cuboid(Cuboid::new(Vec3::new(265.0, 0.0, 295.0), Vec3::new(430.0, 330.0, 460.0), white)),
+            Box::new(Cuboid::new(Vec3::new(130.0, 0.0, 65.0), Vec3::new(295.0, 165.0, 230.0), white.clone())),
+            Box::new(Cuboid::new(Vec3::new(265.0, 0.0, 295.0), Vec3::new(430.0, 330.0, 460.0), white)),
         ],
     }
 }
