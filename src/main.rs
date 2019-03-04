@@ -245,10 +245,26 @@ fn two_perlin_spheres() -> HitableList {
 }
 
 fn cornell_box_base() -> HitableList {
-    let red = Material::Diffuse { albedo: Texture::Constant { color: Vec3::new(0.65, 0.05, 0.05)} };
-    let white = Material::Diffuse { albedo: Texture::Constant { color: Vec3::new(0.73, 0.73, 0.73)} };
-    let green = Material::Diffuse { albedo: Texture::Constant { color: Vec3::new(0.12, 0.45, 0.15)} };
-    let light = Material::DiffuseLight { emit: Texture::Constant { color: Vec3::new(15.0, 15.0, 15.0)} };
+    let red = Material::Diffuse {
+        albedo: Texture::Constant {
+            color: Vec3::new(0.65, 0.05, 0.05),
+        },
+    };
+    let white = Material::Diffuse {
+        albedo: Texture::Constant {
+            color: Vec3::new(0.73, 0.73, 0.73),
+        },
+    };
+    let green = Material::Diffuse {
+        albedo: Texture::Constant {
+            color: Vec3::new(0.12, 0.45, 0.15),
+        },
+    };
+    let light = Material::DiffuseLight {
+        emit: Texture::Constant {
+            color: Vec3::new(15.0, 15.0, 15.0),
+        },
+    };
 
     HitableList {
         list: vec![
@@ -306,6 +322,6 @@ fn cornell_box_base() -> HitableList {
                 flip_normal: true,
                 material: white,
             }),
-        ]
+        ],
     }
 }

@@ -7,6 +7,7 @@ use image::ImageBuffer;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 use std::thread;
+use std::time::{Duration, Instant};
 
 use rand::Rng;
 
@@ -19,6 +20,7 @@ pub struct RenderParams {
 }
 
 pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
+    let begin_time = Instant::now();
     // output
     let mut data = ImageBuffer::new(params.nx as u32, params.ny as u32);
 
@@ -86,7 +88,10 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
     }
 
     data.save(&params.filename).unwrap();
-    pbr.finish_println("done");
+    pbr.finish_println(&format!(
+        "Done in {}\n",
+        humantime::format_duration(begin_time.elapsed())
+    ));
 }
 
 enum Job {
