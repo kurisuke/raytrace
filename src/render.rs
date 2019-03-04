@@ -110,7 +110,7 @@ fn render_job(world: HitableList, in_rx: mpsc::Receiver<Job>, out_tx: mpsc::Send
 
 fn color(r: Ray, world: &HitableList, depth: u32) -> Vec3 {
     if let Some(rec) = world.hit(&r, 0.001, std::f64::MAX) {
-        if depth < 32 {
+        if depth < 64 {
             let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
             if let Some(s) = rec.material.scatter(&r, &rec) {
                 emitted + color(s.ray, world, depth + 1) * s.att
