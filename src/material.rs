@@ -28,7 +28,7 @@ impl Material {
                 scatter_metal(r_in, rec, &albedo, *fuzz),
             Material::Dielectric {ref_index} =>
                 scatter_dielectric(r_in, rec, *ref_index),
-            Material::DiffuseLight {emit} =>
+            Material::DiffuseLight {emit: _} =>
                 None
         }
     }

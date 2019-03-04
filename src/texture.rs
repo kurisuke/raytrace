@@ -1,7 +1,7 @@
 use crate::vec3::Vec3;
 
-use image::{ImageBuffer, RgbImage};
-use rand::{Rng, thread_rng};
+use image::RgbImage;
+use rand::Rng;
 
 #[derive(Clone)]
 pub enum Texture {
@@ -124,7 +124,7 @@ fn perlin_interpolate(c: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
     acc
 }
 
-fn image_texture_value(image: &RgbImage, u: f64, v: f64, p: &Vec3) -> Vec3 {
+fn image_texture_value(image: &RgbImage, u: f64, v: f64, _: &Vec3) -> Vec3 {
     let i = (u * image.width() as f64) as i32;
     let j = ((1.0 - v) * image.height() as f64 - 0.001) as i32;
 

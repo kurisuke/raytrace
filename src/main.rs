@@ -10,10 +10,6 @@ mod sphere;
 mod texture;
 mod vec3;
 
-use std::path::Path;
-use std::fs::File;
-use std::io::BufWriter;
-
 use rand::prelude::*;
 
 use crate::camera::Camera;
@@ -68,8 +64,6 @@ fn main() {
         list: vec![Hitable::BvhNode(bvhnode::BvhNode::new(world.list))]
     };
 
-    let nx = params.nx as u32;
-    let ny = params.ny as u32;
     render::render(world, cam, params);
 }
 

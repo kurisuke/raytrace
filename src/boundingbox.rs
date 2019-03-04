@@ -1,6 +1,5 @@
 use crate::vec3::Vec3;
 use crate::ray::Ray;
-use crate::hitable::HitRecord;
 
 #[derive(Clone)]
 pub struct BoundingBox {

@@ -78,11 +78,6 @@ impl Vec3 {
             e: [self.e[0] / k, self.e[1] / k, self.e[2] / k]
         }
     }
-
-    pub fn normalize01(&self) -> Vec3 {
-        let n = self.normalize();
-        Vec3::mul_s(&Vec3::new(n.e[0] + 1.0, n.e[1] + 1.0, n.e[2] + 1.0), 0.5)
-    }
 }
 
 impl Neg for Vec3 {
