@@ -80,7 +80,7 @@ impl Rect {
                     Axes::XZ { x: _, y: _, z: _ } => Vec3::new(0.0, 1.0, 0.0),
                     Axes::YZ { x: _, y: _, z: _ } => Vec3::new(1.0, 0.0, 0.0),
                 };
-                let n = if self.flip_normal { n } else { -n };
+                let n = if self.flip_normal { -n } else { n };
                 Some(HitRecord {
                     t,
                     p: r.point(t),
