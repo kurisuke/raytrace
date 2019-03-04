@@ -15,7 +15,7 @@ use rand::prelude::*;
 use crate::camera::Camera;
 use crate::hitable::{Hitable, HitableList};
 use crate::material::Material;
-use crate::rect::{Axes, Rect};
+use crate::rect::{Axes, Rect, Cuboid};
 use crate::render::RenderParams;
 use crate::sphere::Sphere;
 use crate::texture::{Perlin, Texture};
@@ -320,8 +320,11 @@ fn cornell_box_base() -> HitableList {
                     z: 555.0,
                 },
                 flip_normal: true,
-                material: white,
+                material: white.clone(),
             }),
+            // two blocks
+            Hitable::Cuboid(Cuboid::new(Vec3::new(130.0, 0.0, 65.0), Vec3::new(295.0, 165.0, 230.0), white.clone())),
+            Hitable::Cuboid(Cuboid::new(Vec3::new(265.0, 0.0, 295.0), Vec3::new(430.0, 330.0, 460.0), white)),
         ],
     }
 }

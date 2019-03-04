@@ -1,5 +1,5 @@
 use crate::boundingbox::BoundingBox;
-use crate::hitable::HitRecord;
+use crate::hitable::{HitRecord, Hitable, HitableList};
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
@@ -108,5 +108,90 @@ impl Rect {
                 max: Vec3::new(x + 0.0001, y.1, z.1),
             }),
         }
+    }
+}
+
+#[derive(Clone)]
+pub struct Cuboid {
+    p_min: Vec3,
+    p_max: Vec3,
+    faces: Box<HitableList>,
+}
+
+impl Cuboid {
+    pub fn new(p_min: Vec3, p_max: Vec3, material: Material) -> Cuboid {
+        Cuboid {
+            p_min,
+            p_max,
+            faces: Box::new(HitableList {
+                list: vec![
+                    Hitable::Rect(Rect {
+                        a: Axes::XY {
+                            x: (p_min.x(), p_max.x()),
+                            y: (p_min.y(), p_max.y()),
+                            z: p_max.z(),
+                        },
+                        flip_normal: false,
+                        material: material.clone(),
+                    }),
+                    Hitable::Rect(Rect {
+                        a: Axes::XY {
+                            x: (p_min.x(), p_max.x()),
+                            y: (p_min.y(), p_max.y()),
+                            z: p_min.z(),
+                        },
+                        flip_normal: true,
+                        material: material.clone(),
+                    }),
+                    Hitable::Rect(Rect {
+                        a: Axes::XZ {
+                            x: (p_min.x(), p_max.x()),
+                            y: p_max.y(),
+                            z: (p_min.z(), p_max.z()),
+                        },
+                        flip_normal: false,
+                        material: material.clone(),
+                    }),
+                    Hitable::Rect(Rect {
+                        a: Axes::XZ {
+                            x: (p_min.x(), p_max.x()),
+                            y: p_min.y(),
+                            z: (p_min.z(), p_max.z()),
+                        },
+                        flip_normal: true,
+                        material: material.clone(),
+                    }),
+                    Hitable::Rect(Rect {
+                        a: Axes::YZ {
+                            x: p_max.x(),
+                            y: (p_min.y(), p_max.y()),
+                            z: (p_min.z(), p_max.z()),
+                        },
+                        flip_normal: false,
+                        material: material.clone(),
+                    }),
+                    Hitable::Rect(Rect {
+                        a: Axes::YZ {
+                            x: p_min.x(),
+                            y: (p_min.y(), p_max.y()),
+                            z: (p_min.z(), p_max.z()),
+                        },
+                        flip_normal: true,
+                        material,
+                    }),
+                ],
+            }),
+        }
+    }
+
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        self.faces.hit(r, t_min, t_max)
+    }
+
+    pub fn bounding_box(&self) -> Option<BoundingBox> {
+        Some(BoundingBox {
+            min: self.p_min,
+            max: self.p_max,
+        })
     }
 }

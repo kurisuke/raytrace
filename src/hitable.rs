@@ -3,7 +3,7 @@ use crate::boundingbox::BoundingBox;
 use crate::bvhnode::BvhNode;
 use crate::material::Material;
 use crate::ray::Ray;
-use crate::rect::Rect;
+use crate::rect::{Cuboid, Rect};
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
@@ -21,6 +21,7 @@ pub enum Hitable {
     BvhNode(BvhNode),
     Sphere(Sphere),
     Rect(Rect),
+    Cuboid(Cuboid),
 }
 
 impl Hitable {
@@ -29,6 +30,7 @@ impl Hitable {
             Hitable::BvhNode(bvh_node) => bvh_node.hit(r, t_min, t_max),
             Hitable::Sphere(sphere) => sphere.hit(r, t_min, t_max),
             Hitable::Rect(rect) => rect.hit(r, t_min, t_max),
+            Hitable::Cuboid(cuboid) => cuboid.hit(r, t_min, t_max),
         }
     }
 
@@ -37,6 +39,7 @@ impl Hitable {
             Hitable::BvhNode(bvh_node) => bvh_node.bounding_box(),
             Hitable::Sphere(sphere) => sphere.bounding_box(),
             Hitable::Rect(rect) => rect.bounding_box(),
+            Hitable::Cuboid(cuboid) => cuboid.bounding_box(),
         }
     }
 }
