@@ -93,7 +93,7 @@ fn main() {
 
     // define the world
     // let world = two_perlin_spheres();
-    let world = cornell_box_base();
+    let mut world = cornell_box_base() + cornell_box_balls();
     let world = HitableList {
         list: vec![Box::new(bvhnode::BvhNode::new(world.list))],
     };
@@ -324,7 +324,19 @@ fn cornell_box_base() -> HitableList {
                 flip_normal: true,
                 material: white.clone(),
             }),
-            // two blocks
+        ],
+    }
+}
+
+fn cornell_box_blocks() -> HitableList {
+    let white = Material::Diffuse {
+        albedo: Texture::Constant {
+            color: Vec3::new(0.73, 0.73, 0.73),
+        },
+    };
+
+    HitableList {
+        list: vec![
             Box::new(Translate::new(
                 Box::new(RotateY::new(
                     Box::new(Cuboid::new(
@@ -347,6 +359,36 @@ fn cornell_box_base() -> HitableList {
                 )),
                 Vec3::new(265.0, 0.0, 295.0),
             )),
+        ],
+    }
+}
+
+fn cornell_box_balls() -> HitableList {
+    let glass = Material::Dielectric {
+        ref_index: 1.5,
+    };
+    let metal = Material::Metal {
+        albedo: Vec3::new(0.7, 0.6, 0.5),
+        fuzz: 0.0,
+    };
+
+    HitableList {
+        list: vec![
+            Box::new(Sphere {
+                center: Vec3::new(212.5, 82.5, 147.5),
+                radius: 82.5,
+                material: glass.clone(),
+            }),
+            Box::new(Sphere {
+                center: Vec3::new(212.5, 82.5, 147.5),
+                radius: -72.5,
+                material: glass,
+            }),
+            Box::new(Sphere {
+                center: Vec3::new(347.5, 82.5, 377.5),
+                radius: 82.5,
+                material: metal,
+            }),
         ],
     }
 }

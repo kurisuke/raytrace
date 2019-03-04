@@ -7,6 +7,8 @@ use crate::rect::{Cuboid, Rect};
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
+use std::ops::{Add, AddAssign};
+
 pub struct HitRecord<'a> {
     pub t: f64,
     pub p: Vec3,
@@ -56,5 +58,23 @@ impl Hitable for HitableList {
         }
 
         bbox
+    }
+}
+
+impl Add for HitableList {
+    type Output = HitableList;
+
+    fn add(self, rhs: HitableList) -> HitableList {
+        let mut list = self.list;
+        list.extend(rhs.list);
+        HitableList {
+            list,
+        }
+    }
+}
+
+impl AddAssign for HitableList {
+    fn add_assign(&mut self, rhs: HitableList) {
+        self.list.extend(rhs.list);
     }
 }
