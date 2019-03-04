@@ -79,13 +79,24 @@ fn main() {
         dist_to_focus,
     );
 
+    let cam_cornell = Camera::new(
+        Vec3::new(278.0, 278.0, -800.0),
+        Vec3::new(278.0, 278.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        40.0,
+        params.nx as f64 / params.ny as f64,
+        0.0,
+        10.0,
+    );
+
     // define the world
-    let world = two_perlin_spheres();
+    // let world = two_perlin_spheres();
+    let world = cornell_box_base();
     let world = HitableList {
         list: vec![Hitable::BvhNode(bvhnode::BvhNode::new(world.list))],
     };
 
-    render::render(world, cam, params);
+    render::render(world, cam_cornell, params);
 }
 
 fn random_scene() -> HitableList {
@@ -230,5 +241,71 @@ fn two_perlin_spheres() -> HitableList {
                 },
             }),
         ],
+    }
+}
+
+fn cornell_box_base() -> HitableList {
+    let red = Material::Diffuse { albedo: Texture::Constant { color: Vec3::new(0.65, 0.05, 0.05)} };
+    let white = Material::Diffuse { albedo: Texture::Constant { color: Vec3::new(0.73, 0.73, 0.73)} };
+    let green = Material::Diffuse { albedo: Texture::Constant { color: Vec3::new(0.12, 0.45, 0.15)} };
+    let light = Material::DiffuseLight { emit: Texture::Constant { color: Vec3::new(15.0, 15.0, 15.0)} };
+
+    HitableList {
+        list: vec![
+            Hitable::Rect(Rect {
+                a: Axes::YZ {
+                    x: 555.0,
+                    y: (0.0, 555.0),
+                    z: (0.0, 555.0),
+                },
+                flip_normal: true,
+                material: green,
+            }),
+            Hitable::Rect(Rect {
+                a: Axes::YZ {
+                    x: 0.0,
+                    y: (0.0, 555.0),
+                    z: (0.0, 555.0),
+                },
+                flip_normal: false,
+                material: red,
+            }),
+            Hitable::Rect(Rect {
+                a: Axes::XZ {
+                    x: (213.0, 343.0),
+                    y: 554.0,
+                    z: (227.0, 332.0),
+                },
+                flip_normal: false,
+                material: light,
+            }),
+            Hitable::Rect(Rect {
+                a: Axes::XZ {
+                    x: (0.0, 555.0),
+                    y: 555.0,
+                    z: (0.0, 555.0),
+                },
+                flip_normal: true,
+                material: white.clone(),
+            }),
+            Hitable::Rect(Rect {
+                a: Axes::XZ {
+                    x: (0.0, 555.0),
+                    y: 0.0,
+                    z: (0.0, 555.0),
+                },
+                flip_normal: false,
+                material: white.clone(),
+            }),
+            Hitable::Rect(Rect {
+                a: Axes::XY {
+                    x: (0.0, 555.0),
+                    y: (0.0, 555.0),
+                    z: 555.0,
+                },
+                flip_normal: true,
+                material: white,
+            }),
+        ]
     }
 }
