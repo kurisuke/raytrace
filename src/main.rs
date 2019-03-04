@@ -80,7 +80,6 @@ fn main() {
     );
 
     // define the world
-    // let world = random_scene();
     let world = two_perlin_spheres();
     let world = HitableList {
         list: vec![Hitable::BvhNode(bvhnode::BvhNode::new(world.list))],

@@ -48,8 +48,7 @@ fn scatter_diffuse(rec: &HitRecord, albedo: &Texture) -> Option<Scatter> {
 }
 
 fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Option<Scatter> {
-    let reflected =
-        reflect(&r_in.direction.normalize(), &rec.n) + Vec3::mul_s(&random_in_unit_sphere(), fuzz);
+    let reflected = reflect(&r_in.direction.normalize(), &rec.n) + fuzz * random_in_unit_sphere();
     if Vec3::dot(&reflected, &rec.n) > 0.0 {
         Some(Scatter {
             att: albedo.clone(),
@@ -121,7 +120,7 @@ fn random_in_unit_sphere() -> Vec3 {
 }
 
 fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-    v.clone() - Vec3::mul_s(&n, 2.0 * Vec3::dot(&v, &n))
+    v.clone() - 2.0 * Vec3::dot(v, n) * *n
 }
 
 fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
@@ -129,7 +128,7 @@ fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
     let dt = Vec3::dot(&uv, n);
     let d = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
     if d > 0.0 {
-        Some(Vec3::mul_s(&(uv - Vec3::mul_s(n, dt)), ni_over_nt) - Vec3::mul_s(&n, d.sqrt()))
+        Some(ni_over_nt * (uv - dt * *n) - d.sqrt() * *n)
     } else {
         None
     }

@@ -35,11 +35,11 @@ impl Camera {
         Camera {
             origin: look_from,
             lower_left: look_from
-                - Vec3::mul_s(&u, half_width * focus_dist)
-                - Vec3::mul_s(&v, half_height * focus_dist)
-                - Vec3::mul_s(&w, focus_dist),
-            horizontal: Vec3::mul_s(&u, 2.0 * half_width * focus_dist),
-            vertical: Vec3::mul_s(&v, 2.0 * half_height * focus_dist),
+                - half_width * focus_dist * u
+                - half_height * focus_dist * v
+                - focus_dist * w,
+            horizontal: 2.0 * half_width * focus_dist * u,
+            vertical: 2.0 * half_height * focus_dist * v,
             lens_radius: aperture / 2.0,
             u,
             v,
@@ -60,13 +60,11 @@ impl Camera {
     }
 
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
-        let rd = Vec3::mul_s(&random_in_unit_disk(), self.lens_radius);
-        let offset = Vec3::mul_s(&self.u, rd.x()) + Vec3::mul_s(&self.v, rd.y());
+        let rd = random_in_unit_disk() * self.lens_radius;
+        let offset = rd.x() * self.u + rd.y() * self.v;
         Ray {
             origin: self.origin + offset,
-            direction: self.lower_left
-                + Vec3::mul_s(&self.horizontal, s)
-                + Vec3::mul_s(&self.vertical, t)
+            direction: self.lower_left + s * self.horizontal + t * self.vertical
                 - self.origin
                 - offset,
         }

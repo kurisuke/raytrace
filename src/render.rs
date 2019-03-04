@@ -72,7 +72,7 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
             }
         }
 
-        let c = Vec3::div_s(&c, params.ns as f64);
+        c /= params.ns as f64;
         *pixel = image::Rgb(convert_rgb_u8(&c, 2.0));
         pbr.inc();
     }
@@ -113,7 +113,7 @@ fn color(r: Ray, world: &HitableList, depth: u32) -> Vec3 {
         if depth < 32 {
             let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
             if let Some(s) = rec.material.scatter(&r, &rec) {
-                emitted + Vec3::mul_v(&color(s.ray, world, depth + 1), &s.att)
+                emitted + color(s.ray, world, depth + 1) * s.att
             } else {
                 emitted
             }

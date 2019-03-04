@@ -33,10 +33,10 @@ impl Texture {
                     even.value(u, v, p)
                 }
             }
-            Texture::PerlinNoise { perlin, scale } => Vec3::mul_s(
-                &Vec3::new(1.0, 1.0, 1.0),
-                0.5 * (1.0 + (scale * p.z() + 10.0 * perlin.turb(p, 7)).sin()),
-            ),
+            Texture::PerlinNoise { perlin, scale } => {
+                0.5 * (1.0 + (scale * p.z() + 10.0 * perlin.turb(p, 7)).sin())
+                    * Vec3::new(1.0, 1.0, 1.0)
+            }
             Texture::Image { image } => image_texture_value(image, u, v, p),
         }
     }
@@ -88,7 +88,7 @@ impl Perlin {
         for _ in 0..depth {
             acc += weight * self.noise(&temp_p);
             weight *= 0.5;
-            temp_p = Vec3::mul_s(&temp_p, 2.0);
+            temp_p *= 2.0;
         }
         acc.abs()
     }

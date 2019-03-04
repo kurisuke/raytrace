@@ -23,7 +23,7 @@ impl Sphere {
             // first solution
             let t = (-b - d.sqrt()) / a;
             if t < t_max && t > t_min {
-                let n = Vec3::div_s(&(r.point(t) - self.center), self.radius);
+                let n = (r.point(t) - self.center) / self.radius;
                 let (u, v) = sphere_uv(&n);
                 Some(HitRecord {
                     t,
@@ -37,7 +37,7 @@ impl Sphere {
                 // second solution
                 let t = (-b + d.sqrt()) / a;
                 if t < t_max && t > t_min {
-                    let n = Vec3::div_s(&(r.point(t) - self.center), self.radius);
+                    let n = r.point(t) - self.center / self.radius;
                     let (u, v) = sphere_uv(&n);
                     Some(HitRecord {
                         t,
