@@ -1,5 +1,5 @@
 use crate::boundingbox::BoundingBox;
-use crate::hitable::{Hitable,HitRecord};
+use crate::hitable::{HitRecord, Hitable};
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;

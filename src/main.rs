@@ -8,6 +8,7 @@ mod rect;
 mod render;
 mod sphere;
 mod texture;
+mod transform;
 mod vec3;
 
 use rand::prelude::*;
@@ -15,10 +16,11 @@ use rand::prelude::*;
 use crate::camera::Camera;
 use crate::hitable::{Hitable, HitableList};
 use crate::material::Material;
-use crate::rect::{Axes, Rect, Cuboid};
+use crate::rect::{Axes, Cuboid, Rect};
 use crate::render::RenderParams;
 use crate::sphere::Sphere;
 use crate::texture::{Perlin, Texture};
+use crate::transform::{RotateY, Translate};
 use crate::vec3::Vec3;
 
 fn main() {
@@ -323,8 +325,28 @@ fn cornell_box_base() -> HitableList {
                 material: white.clone(),
             }),
             // two blocks
-            Box::new(Cuboid::new(Vec3::new(130.0, 0.0, 65.0), Vec3::new(295.0, 165.0, 230.0), white.clone())),
-            Box::new(Cuboid::new(Vec3::new(265.0, 0.0, 295.0), Vec3::new(430.0, 330.0, 460.0), white)),
+            Box::new(Translate::new(
+                Box::new(RotateY::new(
+                    Box::new(Cuboid::new(
+                        Vec3::default(),
+                        Vec3::new(165.0, 165.0, 165.0),
+                        white.clone(),
+                    )),
+                    -18.0,
+                )),
+                Vec3::new(130.0, 0.0, 65.0),
+            )),
+            Box::new(Translate::new(
+                Box::new(RotateY::new(
+                    Box::new(Cuboid::new(
+                        Vec3::default(),
+                        Vec3::new(165.0, 330.0, 165.0),
+                        white,
+                    )),
+                    15.0,
+                )),
+                Vec3::new(265.0, 0.0, 295.0),
+            )),
         ],
     }
 }

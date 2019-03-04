@@ -4,9 +4,9 @@ use crate::ray::Ray;
 use crate::vec3::Vec3;
 
 use image::ImageBuffer;
-use std::sync::Arc;
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
+use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -92,7 +92,7 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
     data.save(&params.filename).unwrap();
     pbr.finish_println(&format!(
         "Done in {}\n",
-        humantime::format_duration(begin_time.elapsed())
+        humantime::format_duration(Duration::from_secs(begin_time.elapsed().as_secs()))
     ));
 }
 
