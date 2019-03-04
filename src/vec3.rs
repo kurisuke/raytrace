@@ -1,7 +1,6 @@
-use std::iter::Sum;
-use std::ops::{Neg, Index, IndexMut,
-               Add, AddAssign, Sub, SubAssign};
 use std::fmt;
+use std::iter::Sum;
+use std::ops::{Add, AddAssign, Index, IndexMut, Neg, Sub, SubAssign};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
@@ -10,45 +9,53 @@ pub struct Vec3 {
 
 impl Vec3 {
     pub fn default() -> Vec3 {
-        Vec3 {
-            e: [0.0, 0.0, 0.0]
-        }
+        Vec3 { e: [0.0, 0.0, 0.0] }
     }
 
     pub fn new(e0: f64, e1: f64, e2: f64) -> Vec3 {
-        Vec3 {
-            e: [e0, e1, e2]
-        }
+        Vec3 { e: [e0, e1, e2] }
     }
 
-    pub fn x(&self) -> f64 { self.e[0] }
-    pub fn y(&self) -> f64 { self.e[1] }
-    pub fn z(&self) -> f64 { self.e[2] }
-    pub fn r(&self) -> f64 { self.e[0] }
-    pub fn g(&self) -> f64 { self.e[1] }
-    pub fn b(&self) -> f64 { self.e[2] }
+    pub fn x(&self) -> f64 {
+        self.e[0]
+    }
+    pub fn y(&self) -> f64 {
+        self.e[1]
+    }
+    pub fn z(&self) -> f64 {
+        self.e[2]
+    }
+    pub fn r(&self) -> f64 {
+        self.e[0]
+    }
+    pub fn g(&self) -> f64 {
+        self.e[1]
+    }
+    pub fn b(&self) -> f64 {
+        self.e[2]
+    }
 
     pub fn mul_s(v: &Vec3, s: f64) -> Vec3 {
         Vec3 {
-            e: [v.e[0] * s, v.e[1] * s, v.e[2] * s]
+            e: [v.e[0] * s, v.e[1] * s, v.e[2] * s],
         }
     }
 
     pub fn mul_v(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Vec3 {
-            e: [v1.e[0] * v2.e[0], v1.e[1] * v2.e[1], v1.e[2] * v2.e[2]]
+            e: [v1.e[0] * v2.e[0], v1.e[1] * v2.e[1], v1.e[2] * v2.e[2]],
         }
     }
 
     pub fn div_s(v: &Vec3, s: f64) -> Vec3 {
         Vec3 {
-            e: [v.e[0] / s, v.e[1] / s, v.e[2] / s]
+            e: [v.e[0] / s, v.e[1] / s, v.e[2] / s],
         }
     }
 
     pub fn div_v(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Vec3 {
-            e: [v1.e[0] / v2.e[0], v1.e[1] / v2.e[1], v1.e[2] / v2.e[2]]
+            e: [v1.e[0] / v2.e[0], v1.e[1] / v2.e[1], v1.e[2] / v2.e[2]],
         }
     }
 
@@ -58,9 +65,11 @@ impl Vec3 {
 
     pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
         Vec3 {
-            e: [v1.e[1] * v2.e[2] - v1.e[2] * v2.e[1],
+            e: [
+                v1.e[1] * v2.e[2] - v1.e[2] * v2.e[1],
                 v1.e[2] * v2.e[0] - v1.e[0] * v2.e[2],
-                v1.e[0] * v2.e[1] - v1.e[1] * v2.e[0]]
+                v1.e[0] * v2.e[1] - v1.e[1] * v2.e[0],
+            ],
         }
     }
 
@@ -75,7 +84,7 @@ impl Vec3 {
     pub fn normalize(&self) -> Vec3 {
         let k = self.len();
         Vec3 {
-            e: [self.e[0] / k, self.e[1] / k, self.e[2] / k]
+            e: [self.e[0] / k, self.e[1] / k, self.e[2] / k],
         }
     }
 }
@@ -85,7 +94,7 @@ impl Neg for Vec3 {
 
     fn neg(self) -> Vec3 {
         Vec3 {
-            e: [-self.e[0], -self.e[1], -self.e[2]]
+            e: [-self.e[0], -self.e[1], -self.e[2]],
         }
     }
 }
@@ -109,9 +118,11 @@ impl Add for Vec3 {
 
     fn add(self, other: Vec3) -> Vec3 {
         Vec3 {
-            e: [self.e[0] + other.e[0],
+            e: [
+                self.e[0] + other.e[0],
                 self.e[1] + other.e[1],
-                self.e[2] + other.e[2]]
+                self.e[2] + other.e[2],
+            ],
         }
     }
 }
@@ -129,9 +140,11 @@ impl Sub for Vec3 {
 
     fn sub(self, other: Vec3) -> Vec3 {
         Vec3 {
-            e: [self.e[0] - other.e[0],
+            e: [
+                self.e[0] - other.e[0],
                 self.e[1] - other.e[1],
-                self.e[2] - other.e[2]]
+                self.e[2] - other.e[2],
+            ],
         }
     }
 }
@@ -152,7 +165,9 @@ impl fmt::Display for Vec3 {
 
 impl Sum for Vec3 {
     fn sum<I>(it: I) -> Self
-    where I: Iterator<Item = Vec3> {
+    where
+        I: Iterator<Item = Vec3>,
+    {
         it.fold(Vec3::default(), |acc, x| acc + x)
     }
 }

@@ -1,8 +1,8 @@
+use crate::boundingbox::BoundingBox;
 use crate::hitable::HitRecord;
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
-use crate::material::Material;
-use crate::boundingbox::BoundingBox;
 
 #[derive(Clone)]
 pub struct Sphere {
@@ -31,10 +31,9 @@ impl Sphere {
                     n,
                     u,
                     v,
-                    material: &self.material
+                    material: &self.material,
                 })
-            }
-            else {
+            } else {
                 // second solution
                 let t = (-b + d.sqrt()) / a;
                 if t < t_max && t > t_min {
@@ -48,13 +47,11 @@ impl Sphere {
                         v,
                         material: &self.material,
                     })
-                }
-                else {
+                } else {
                     None
                 }
             }
-        }
-        else {
+        } else {
             None
         }
     }

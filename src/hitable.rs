@@ -1,11 +1,11 @@
-use crate::ray::Ray;
-use crate::vec3::Vec3;
-use crate::material::Material;
-use crate::sphere::Sphere;
-use crate::boundingbox::BoundingBox;
 use crate::boundingbox;
+use crate::boundingbox::BoundingBox;
 use crate::bvhnode::BvhNode;
+use crate::material::Material;
+use crate::ray::Ray;
 use crate::rect::Rect;
+use crate::sphere::Sphere;
+use crate::vec3::Vec3;
 
 pub struct HitRecord<'a> {
     pub t: f64,
@@ -48,7 +48,7 @@ pub struct HitableList {
 
 impl HitableList {
     pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        let mut hit_record : Option<HitRecord> = None;
+        let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;
         for item in &self.list {
             if let Some(temp_record) = item.hit(r, t_min, closest_so_far) {
@@ -60,17 +60,15 @@ impl HitableList {
     }
 
     pub fn bounding_box(&self) -> Option<BoundingBox> {
-        let mut bbox : Option<BoundingBox> = None;
+        let mut bbox: Option<BoundingBox> = None;
         for item in &self.list {
             if let Some(temp_bbox) = item.bounding_box() {
                 if bbox.is_some() {
                     bbox = Some(boundingbox::surrounding_box(&bbox.unwrap(), &temp_bbox));
-                }
-                else {
+                } else {
                     bbox = Some(temp_bbox);
                 }
-            }
-            else {
+            } else {
                 return None;
             }
         }

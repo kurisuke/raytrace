@@ -1,5 +1,5 @@
-use crate::vec3::Vec3;
 use crate::ray::Ray;
+use crate::vec3::Vec3;
 
 use rand::Rng;
 
@@ -15,8 +15,15 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(look_from: Vec3, look_at: Vec3, vup: Vec3,
-               vfov: f64, aspect: f64, aperture: f64, focus_dist: f64) -> Camera {
+    pub fn new(
+        look_from: Vec3,
+        look_at: Vec3,
+        vup: Vec3,
+        vfov: f64,
+        aspect: f64,
+        aperture: f64,
+        focus_dist: f64,
+    ) -> Camera {
         let theta = vfov * std::f64::consts::PI / 180.0;
         let half_height = (theta / 2.0).tan();
         let half_width = aspect * half_height;
@@ -27,7 +34,8 @@ impl Camera {
 
         Camera {
             origin: look_from,
-            lower_left: look_from - Vec3::mul_s(&u, half_width * focus_dist)
+            lower_left: look_from
+                - Vec3::mul_s(&u, half_width * focus_dist)
                 - Vec3::mul_s(&v, half_height * focus_dist)
                 - Vec3::mul_s(&w, focus_dist),
             horizontal: Vec3::mul_s(&u, 2.0 * half_width * focus_dist),
@@ -40,10 +48,15 @@ impl Camera {
     }
 
     pub fn default(aspect: f64) -> Camera {
-        Camera::new(Vec3::new(0.0, 0.0, 0.0),
-                    Vec3::new(0.0, 0.0, -1.0),
-                    Vec3::new(0.0, 1.0, 0.0),
-                    90.0, aspect, 2.0, 1.0)
+        Camera::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, -1.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            90.0,
+            aspect,
+            2.0,
+            1.0,
+        )
     }
 
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
@@ -51,8 +64,11 @@ impl Camera {
         let offset = Vec3::mul_s(&self.u, rd.x()) + Vec3::mul_s(&self.v, rd.y());
         Ray {
             origin: self.origin + offset,
-            direction: self.lower_left + Vec3::mul_s(&self.horizontal, s)
-                + Vec3::mul_s(&self.vertical, t) - self.origin - offset,
+            direction: self.lower_left
+                + Vec3::mul_s(&self.horizontal, s)
+                + Vec3::mul_s(&self.vertical, t)
+                - self.origin
+                - offset,
         }
     }
 }

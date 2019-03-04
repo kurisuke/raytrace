@@ -1,5 +1,5 @@
-use crate::vec3::Vec3;
 use crate::ray::Ray;
+use crate::vec3::Vec3;
 
 #[derive(Clone)]
 pub struct BoundingBox {
@@ -28,11 +28,15 @@ impl BoundingBox {
 
 pub fn surrounding_box(box0: &BoundingBox, box1: &BoundingBox) -> BoundingBox {
     BoundingBox {
-        min: Vec3::new(box0.min.x().min(box1.min.x()),
-                       box0.min.y().min(box1.min.y()),
-                       box0.min.z().min(box1.min.z())),
-        max: Vec3::new(box0.max.x().max(box1.max.x()),
-                       box0.max.y().max(box1.max.y()),
-                       box0.max.z().max(box1.max.z())),
+        min: Vec3::new(
+            box0.min.x().min(box1.min.x()),
+            box0.min.y().min(box1.min.y()),
+            box0.min.z().min(box1.min.z()),
+        ),
+        max: Vec3::new(
+            box0.max.x().max(box1.max.x()),
+            box0.max.y().max(box1.max.y()),
+            box0.max.z().max(box1.max.z()),
+        ),
     }
 }

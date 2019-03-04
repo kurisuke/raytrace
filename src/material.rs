@@ -12,33 +12,26 @@ pub struct Scatter {
 
 #[derive(Clone)]
 pub enum Material {
-    Diffuse {albedo: Texture},
-    Metal {albedo: Vec3, fuzz: f64},
-    Dielectric {ref_index: f64},
-    DiffuseLight {emit: Texture},
+    Diffuse { albedo: Texture },
+    Metal { albedo: Vec3, fuzz: f64 },
+    Dielectric { ref_index: f64 },
+    DiffuseLight { emit: Texture },
 }
 
 impl Material {
-    pub fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<Scatter>
-    {
+    pub fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<Scatter> {
         match self {
-            Material::Diffuse {albedo} =>
-                scatter_diffuse(rec, &albedo),
-            Material::Metal {albedo, fuzz} =>
-                scatter_metal(r_in, rec, &albedo, *fuzz),
-            Material::Dielectric {ref_index} =>
-                scatter_dielectric(r_in, rec, *ref_index),
-            Material::DiffuseLight {emit: _} =>
-                None
+            Material::Diffuse { albedo } => scatter_diffuse(rec, &albedo),
+            Material::Metal { albedo, fuzz } => scatter_metal(r_in, rec, &albedo, *fuzz),
+            Material::Dielectric { ref_index } => scatter_dielectric(r_in, rec, *ref_index),
+            Material::DiffuseLight { emit: _ } => None,
         }
     }
 
     pub fn emitted(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
         match self {
-            Material::DiffuseLight {emit} =>
-                emit.value(u, v, p),
-            _ =>
-                Vec3::new(0.0, 0.0, 0.0),
+            Material::DiffuseLight { emit } => emit.value(u, v, p),
+            _ => Vec3::new(0.0, 0.0, 0.0),
         }
     }
 }
@@ -50,22 +43,22 @@ fn scatter_diffuse(rec: &HitRecord, albedo: &Texture) -> Option<Scatter> {
         ray: Ray {
             origin: rec.p,
             direction: target - rec.p,
-        }
+        },
     })
 }
 
 fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Option<Scatter> {
-    let reflected = reflect(&r_in.direction.normalize(), &rec.n) + Vec3::mul_s(&random_in_unit_sphere(), fuzz);
+    let reflected =
+        reflect(&r_in.direction.normalize(), &rec.n) + Vec3::mul_s(&random_in_unit_sphere(), fuzz);
     if Vec3::dot(&reflected, &rec.n) > 0.0 {
         Some(Scatter {
             att: albedo.clone(),
             ray: Ray {
                 origin: rec.p,
                 direction: reflected,
-            }
+            },
         })
-    }
-    else {
+    } else {
         None
     }
 }
@@ -73,7 +66,11 @@ fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Optio
 fn scatter_dielectric(r_in: &Ray, rec: &HitRecord, ref_index: f64) -> Option<Scatter> {
     let din = Vec3::dot(&r_in.direction, &rec.n);
     let outward_normal = if din > 0.0 { -rec.n } else { rec.n };
-    let ni_over_nt = if din > 0.0 { ref_index } else { 1.0 / ref_index };
+    let ni_over_nt = if din > 0.0 {
+        ref_index
+    } else {
+        1.0 / ref_index
+    };
     let cosine = if din > 0.0 {
         ref_index * din / r_in.direction.len()
     } else {
@@ -112,9 +109,11 @@ fn random_in_unit_sphere() -> Vec3 {
     let mut rng = rand::thread_rng();
 
     loop {
-        let p = Vec3::new(rng.gen_range(-1.0, 1.0),
-                          rng.gen_range(-1.0, 1.0),
-                          rng.gen_range(-1.0, 1.0));
+        let p = Vec3::new(
+            rng.gen_range(-1.0, 1.0),
+            rng.gen_range(-1.0, 1.0),
+            rng.gen_range(-1.0, 1.0),
+        );
         if p.len_squared() < 1.0 {
             return p;
         }
@@ -130,11 +129,8 @@ fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
     let dt = Vec3::dot(&uv, n);
     let d = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
     if d > 0.0 {
-        Some(Vec3::mul_s(&(uv - Vec3::mul_s(n, dt)), ni_over_nt) -
-             Vec3::mul_s(&n, d.sqrt())
-        )
-    }
-    else {
+        Some(Vec3::mul_s(&(uv - Vec3::mul_s(n, dt)), ni_over_nt) - Vec3::mul_s(&n, d.sqrt()))
+    } else {
         None
     }
 }

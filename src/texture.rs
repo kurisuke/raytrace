@@ -5,31 +5,39 @@ use rand::Rng;
 
 #[derive(Clone)]
 pub enum Texture {
-    Constant {color: Vec3},
-    Checker {odd: Box<Texture>, even: Box<Texture>},
-    PerlinNoise {perlin: Perlin, scale: f64},
-    Image {image: RgbImage},
+    Constant {
+        color: Vec3,
+    },
+    Checker {
+        odd: Box<Texture>,
+        even: Box<Texture>,
+    },
+    PerlinNoise {
+        perlin: Perlin,
+        scale: f64,
+    },
+    Image {
+        image: RgbImage,
+    },
 }
 
 impl Texture {
     pub fn value(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
         match self {
-            Texture::Constant {color} => color.clone(),
-            Texture::Checker {odd, even} => {
+            Texture::Constant { color } => color.clone(),
+            Texture::Checker { odd, even } => {
                 let sines = (10.0 * p.x()).sin() * (10.0 * p.y()).sin() * (10.0 * p.z()).sin();
                 if sines < 0.0 {
                     odd.value(u, v, p)
                 } else {
                     even.value(u, v, p)
                 }
-            },
-            Texture::PerlinNoise {perlin, scale} => {
-                Vec3::mul_s(&Vec3::new(1.0, 1.0, 1.0),
-                            0.5 * (1.0 + (scale * p.z() + 10.0 * perlin.turb(p, 7)).sin()))
-            },
-            Texture::Image {image} => {
-                image_texture_value(image, u, v, p)
             }
+            Texture::PerlinNoise { perlin, scale } => Vec3::mul_s(
+                &Vec3::new(1.0, 1.0, 1.0),
+                0.5 * (1.0 + (scale * p.z() + 10.0 * perlin.turb(p, 7)).sin()),
+            ),
+            Texture::Image { image } => image_texture_value(image, u, v, p),
         }
     }
 }
@@ -63,10 +71,10 @@ impl Perlin {
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    c[di as usize][dj as usize][dk as usize] = self.values[
-                        self.perm_x[((i + di) & 255) as usize] ^
-                        self.perm_y[((j + dj) & 255) as usize] ^
-                        self.perm_z[((k + dk) & 255) as usize]];
+                    c[di as usize][dj as usize][dk as usize] = self.values[self.perm_x
+                        [((i + di) & 255) as usize]
+                        ^ self.perm_y[((j + dj) & 255) as usize]
+                        ^ self.perm_z[((k + dk) & 255) as usize]];
                 }
             }
         }
@@ -88,9 +96,16 @@ impl Perlin {
 
 fn perlin_generate() -> [Vec3; 256] {
     let mut rng = rand::thread_rng();
-    let v = (0..256).map(|_| Vec3::new(rng.gen_range(-1.0, 1.0),
-                                       rng.gen_range(-1.0, 1.0),
-                                       rng.gen_range(-1.0, 1.0)).normalize()).collect::<Vec<Vec3>>();
+    let v = (0..256)
+        .map(|_| {
+            Vec3::new(
+                rng.gen_range(-1.0, 1.0),
+                rng.gen_range(-1.0, 1.0),
+                rng.gen_range(-1.0, 1.0),
+            )
+            .normalize()
+        })
+        .collect::<Vec<Vec3>>();
     let mut p = [Vec3::default(); 256];
     p.copy_from_slice(&v);
     p
@@ -114,10 +129,10 @@ fn perlin_interpolate(c: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
         for j in 0..2 {
             for k in 0..2 {
                 let weight_v = Vec3::new(u - i as f64, v - j as f64, w - k as f64);
-                acc += (i as f64 * uu + (1 - i) as f64 * (1.0 - uu)) *
-                    (j as f64 * vv + (1 - j) as f64 * (1.0 - vv)) *
-                    (k as f64 * ww + (1 - k) as f64 * (1.0 - ww)) *
-                    Vec3::dot(&c[i][j][k], &weight_v);
+                acc += (i as f64 * uu + (1 - i) as f64 * (1.0 - uu))
+                    * (j as f64 * vv + (1 - j) as f64 * (1.0 - vv))
+                    * (k as f64 * ww + (1 - k) as f64 * (1.0 - ww))
+                    * Vec3::dot(&c[i][j][k], &weight_v);
             }
         }
     }
@@ -129,10 +144,18 @@ fn image_texture_value(image: &RgbImage, u: f64, v: f64, _: &Vec3) -> Vec3 {
     let j = ((1.0 - v) * image.height() as f64 - 0.001) as i32;
 
     // boundaries
-    let i = if i < 0 {0} else {i};
-    let j = if j < 0 {0} else {j};
-    let i = if i > image.width() as i32 - 1 {image.width() - 1} else {i as u32};
-    let j = if j > image.height() as i32 - 1 {image.height() - 1} else {j as u32};
+    let i = if i < 0 { 0 } else { i };
+    let j = if j < 0 { 0 } else { j };
+    let i = if i > image.width() as i32 - 1 {
+        image.width() - 1
+    } else {
+        i as u32
+    };
+    let j = if j > image.height() as i32 - 1 {
+        image.height() - 1
+    } else {
+        j as u32
+    };
 
     let pixel = image.get_pixel(i, j);
     Vec3::new(

@@ -1,12 +1,12 @@
 use crate::camera::Camera;
-use crate::ray::Ray;
 use crate::hitable::HitableList;
+use crate::ray::Ray;
 use crate::vec3::Vec3;
 
-use std::sync::mpsc;
-use std::sync::mpsc::{Sender, Receiver};
-use std::thread;
 use image::ImageBuffer;
+use std::sync::mpsc;
+use std::sync::mpsc::{Receiver, Sender};
+use std::thread;
 
 use rand::Rng;
 
@@ -18,8 +18,7 @@ pub struct RenderParams {
     pub filename: String,
 }
 
-pub fn render(world: HitableList, cam: Camera, params: RenderParams)
-{
+pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
     // output
     let mut data = ImageBuffer::new(params.nx as u32, params.ny as u32);
 
@@ -54,11 +53,13 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams)
 
         let mut c = Vec3::new(0.0, 0.0, 0.0);
         for in_tx in &child_in_tx {
-            let rs : Vec<_> = (0..samples_per_thread).map(|_| {
-                let u = (i as f64 + rng.gen::<f64>()) / params.nx as f64;
-                let v = (j as f64 + rng.gen::<f64>()) / params.ny as f64;
-                cam.get_ray(u, v)
-            }).collect();
+            let rs: Vec<_> = (0..samples_per_thread)
+                .map(|_| {
+                    let u = (i as f64 + rng.gen::<f64>()) / params.nx as f64;
+                    let v = (j as f64 + rng.gen::<f64>()) / params.ny as f64;
+                    cam.get_ray(u, v)
+                })
+                .collect();
             in_tx.send(Job::Data(rs)).unwrap();
         }
 
@@ -99,8 +100,10 @@ fn render_job(world: HitableList, in_rx: mpsc::Receiver<Job>, out_tx: mpsc::Send
             Job::Data(rs) => {
                 let c = rs.into_iter().map(|r| color(r, &world, 0)).sum();
                 out_tx.send(c).unwrap();
-            },
-            Job::End => { break; }
+            }
+            Job::End => {
+                break;
+            }
         }
     }
 }
@@ -111,12 +114,10 @@ fn color(r: Ray, world: &HitableList, depth: u32) -> Vec3 {
             let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
             if let Some(s) = rec.material.scatter(&r, &rec) {
                 emitted + Vec3::mul_v(&color(s.ray, world, depth + 1), &s.att)
-            }
-            else {
+            } else {
                 emitted
             }
-        }
-        else {
+        } else {
             Vec3::default()
         }
     } else {

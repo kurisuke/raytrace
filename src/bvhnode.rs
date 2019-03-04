@@ -1,6 +1,6 @@
-use crate::hitable::{Hitable, HitRecord};
-use crate::boundingbox::BoundingBox;
 use crate::boundingbox;
+use crate::boundingbox::BoundingBox;
+use crate::hitable::{HitRecord, Hitable};
 use crate::ray::Ray;
 
 use rand::Rng;
@@ -17,25 +17,25 @@ impl BvhNode {
         let mut rng = rand::thread_rng();
         let mut sorted_items = items;
 
-        let axis : usize = rng.gen_range(0, 3);
+        let axis: usize = rng.gen_range(0, 3);
         if axis == 0 {
             sorted_items.sort_by(|a, b| {
                 let box_left = a.bounding_box().unwrap();
                 let box_right = b.bounding_box().unwrap();
                 box_left.min.x().partial_cmp(&box_right.min.x()).unwrap()
-            } );
+            });
         } else if axis == 1 {
             sorted_items.sort_by(|a, b| {
                 let box_left = a.bounding_box().unwrap();
                 let box_right = b.bounding_box().unwrap();
                 box_left.min.y().partial_cmp(&box_right.min.y()).unwrap()
-            } );
+            });
         } else {
             sorted_items.sort_by(|a, b| {
                 let box_left = a.bounding_box().unwrap();
                 let box_right = b.bounding_box().unwrap();
                 box_left.min.z().partial_cmp(&box_right.min.z()).unwrap()
-            } );
+            });
         }
 
         if sorted_items.len() == 1 {
@@ -49,8 +49,10 @@ impl BvhNode {
         } else if sorted_items.len() == 2 {
             let right = Box::new(sorted_items.pop().unwrap());
             let left = Box::new(sorted_items.pop().unwrap());
-            let bbox = boundingbox::surrounding_box(&left.bounding_box().unwrap(),
-                                                    &right.bounding_box().unwrap());
+            let bbox = boundingbox::surrounding_box(
+                &left.bounding_box().unwrap(),
+                &right.bounding_box().unwrap(),
+            );
             BvhNode {
                 left,
                 right: Some(right),
@@ -62,8 +64,10 @@ impl BvhNode {
 
             let left = BvhNode::new(left);
             let right = BvhNode::new(right);
-            let bbox = boundingbox::surrounding_box(&left.bounding_box().unwrap(),
-                                                    &right.bounding_box().unwrap());
+            let bbox = boundingbox::surrounding_box(
+                &left.bounding_box().unwrap(),
+                &right.bounding_box().unwrap(),
+            );
             BvhNode {
                 left: Box::new(Hitable::BvhNode(left)),
                 right: Some(Box::new(Hitable::BvhNode(right))),
@@ -85,8 +89,7 @@ impl BvhNode {
                     } else {
                         hit_right
                     }
-                }
-                else if hit_left.is_some() {
+                } else if hit_left.is_some() {
                     hit_left
                 } else if hit_right.is_some() {
                     hit_right
