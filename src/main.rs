@@ -23,7 +23,7 @@ use crate::sphere::Sphere;
 use crate::material::Material;
 use crate::render::{RenderParams};
 use crate::texture::{Perlin, Texture};
-use crate::rect::XYRect;
+use crate::rect::{Axes,Rect};
 
 fn main() {
     // command line argument
@@ -198,13 +198,16 @@ fn two_perlin_spheres() -> HitableList {
                     albedo: text2,
                 }
             }),
-            Hitable::XYRect(XYRect {
-                x: (3.0, 5.0),
-                y: (1.0, 3.0),
-                k: -2.0,
+            Hitable::Rect(Rect {
+                a: Axes::XY {
+                    x: (3.0, 5.0),
+                    y: (1.0, 3.0),
+                    z: -2.0,
+                },
+                flip_normal: false,
                 material: Material::DiffuseLight {
                     emit: Texture::Constant { color: Vec3::new(4.0, 4.0, 4.0) },
-                }
+                },
             }),
             Hitable::Sphere(Sphere {
                 center: Vec3::new(0.0, 7.0, 0.0),

@@ -5,7 +5,7 @@ use crate::sphere::Sphere;
 use crate::boundingbox::BoundingBox;
 use crate::boundingbox;
 use crate::bvhnode::BvhNode;
-use crate::rect::XYRect;
+use crate::rect::Rect;
 
 pub struct HitRecord<'a> {
     pub t: f64,
@@ -20,7 +20,7 @@ pub struct HitRecord<'a> {
 pub enum Hitable {
     BvhNode(BvhNode),
     Sphere(Sphere),
-    XYRect(XYRect),
+    Rect(Rect),
 }
 
 impl Hitable {
@@ -28,7 +28,7 @@ impl Hitable {
         match self {
             Hitable::BvhNode(bvh_node) => bvh_node.hit(r, t_min, t_max),
             Hitable::Sphere(sphere) => sphere.hit(r, t_min, t_max),
-            Hitable::XYRect(xy_rect) => xy_rect.hit(r, t_min, t_max),
+            Hitable::Rect(rect) => rect.hit(r, t_min, t_max),
         }
     }
 
@@ -36,7 +36,7 @@ impl Hitable {
         match self {
             Hitable::BvhNode(bvh_node) => bvh_node.bounding_box(),
             Hitable::Sphere(sphere) => sphere.bounding_box(),
-            Hitable::XYRect(xy_rect) => xy_rect.bounding_box(),
+            Hitable::Rect(rect) => rect.bounding_box(),
         }
     }
 }
