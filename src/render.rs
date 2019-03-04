@@ -125,7 +125,9 @@ fn color(r: Ray, world: &HitableList, depth: u32) -> Vec3 {
 }
 
 fn convert_rgb_u8(v: &Vec3, gamma: f64) -> [u8; 3] {
-    [(255.99 * v[0].powf(1.0 / gamma)) as u8,
-        (255.99 * v[1].powf(1.0 / gamma)) as u8,
-        (255.99 * v[2].powf(1.0 / gamma)) as u8]
+    let mut rgb = [0; 3];
+    for i in 0..3 {
+        rgb[i] = (255.99 * v[i].powf(1.0 / gamma)).min(255.0) as u8;
+    }
+    rgb
 }
