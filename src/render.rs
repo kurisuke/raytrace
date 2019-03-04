@@ -54,19 +54,19 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams)
 
         let mut c = Vec3::new(0.0, 0.0, 0.0);
         for in_tx in &child_in_tx {
-            for _ in 0..samples_per_thread {
+            let rs : Vec<_> = (0..samples_per_thread).map(|_| {
                 let u = (i as f64 + rng.gen::<f64>()) / params.nx as f64;
                 let v = (j as f64 + rng.gen::<f64>()) / params.ny as f64;
-                let r = cam.get_ray(u, v);
-                in_tx.send(Job::Data(r)).unwrap();
-            }
+                cam.get_ray(u, v)
+            }).collect();
+            in_tx.send(Job::Data(rs)).unwrap();
         }
 
         let mut count_output = 0;
         for cs in &out_rx {
             c += cs;
             count_output += 1;
-            if count_output == params.ns {
+            if count_output == params.nt {
                 break;
             }
         }
@@ -89,15 +89,15 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams)
 }
 
 enum Job {
-    Data(Ray),
+    Data(Vec<Ray>),
     End,
 }
 
 fn render_job(world: HitableList, in_rx: mpsc::Receiver<Job>, out_tx: mpsc::Sender<Vec3>) {
     for j in in_rx {
         match j {
-            Job::Data(r) => {
-                let c = color(r, &world, 0);
+            Job::Data(rs) => {
+                let c = rs.into_iter().map(|r| color(r, &world, 0)).sum();
                 out_tx.send(c).unwrap();
             },
             Job::End => { break; }

@@ -1,3 +1,4 @@
+use std::iter::Sum;
 use std::ops::{Neg, Index, IndexMut,
                Add, AddAssign, Sub, SubAssign};
 use std::fmt;
@@ -151,6 +152,13 @@ impl SubAssign for Vec3 {
 impl fmt::Display for Vec3 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[{} {} {}]", self.e[0], self.e[1], self.e[2])
+    }
+}
+
+impl Sum for Vec3 {
+    fn sum<I>(it: I) -> Self
+    where I: Iterator<Item = Vec3> {
+        it.fold(Vec3::default(), |acc, x| acc + x)
     }
 }
 
