@@ -37,11 +37,11 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
         // invert y coordinate
         let j = params.ny - j - 1;
 
-        let work: Vec<(f64, f64)> = (0..params.ns)
+        let work: Vec<(f32, f32)> = (0..params.ns)
             .map(|_| {
                 (
-                    (i as f64 + rng.gen::<f64>()) / params.nx as f64,
-                    (j as f64 + rng.gen::<f64>()) / params.ny as f64,
+                    (i as f32 + rng.gen::<f32>()) / params.nx as f32,
+                    (j as f32 + rng.gen::<f32>()) / params.ny as f32,
                 )
             })
             .collect();
@@ -53,7 +53,7 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
                 color(r, &world, 0)
             })
             .sum::<Vec3>()
-            / params.ns as f64;
+            / params.ns as f32;
 
         *pixel = image::Rgb(convert_rgb_u8(&c, 2.0));
         pbr.inc();
@@ -67,7 +67,7 @@ pub fn render(world: HitableList, cam: Camera, params: RenderParams) {
 }
 
 fn color(r: Ray, world: &HitableList, depth: u32) -> Vec3 {
-    if let Some(rec) = world.hit(&r, 0.001, std::f64::MAX) {
+    if let Some(rec) = world.hit(&r, 0.001, std::f32::MAX) {
         if depth < 64 {
             let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
             if let Some(s) = rec.material.scatter(&r, &rec) {
@@ -83,10 +83,10 @@ fn color(r: Ray, world: &HitableList, depth: u32) -> Vec3 {
     }
 }
 
-fn convert_rgb_u8(v: &Vec3, gamma: f64) -> [u8; 3] {
+fn convert_rgb_u8(v: &Vec3, gamma: f32) -> [u8; 3] {
     let mut rgb = [0; 3];
     for i in 0..3 {
-        rgb[i] = (255.99 * v[i].powf(1.0 / gamma)).min(255.0) as u8;
+        rgb[i] = (255.99 * v.i(i).powf(1.0 / gamma)).min(255.0) as u8;
     }
     rgb
 }

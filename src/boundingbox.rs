@@ -8,11 +8,11 @@ pub struct BoundingBox {
 }
 
 impl BoundingBox {
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> bool {
+    pub fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> bool {
         for a in 0..3 {
-            let inv_d = 1.0 / r.direction[a];
-            let mut t0 = (self.min[a] - r.origin[a]) * inv_d;
-            let mut t1 = (self.max[a] - r.origin[a]) * inv_d;
+            let inv_d = 1.0 / r.direction.i(a);
+            let mut t0 = (self.min.i(a) - r.origin.i(a)) * inv_d;
+            let mut t1 = (self.max.i(a) - r.origin.i(a)) * inv_d;
             if inv_d < 0.0 {
                 std::mem::swap(&mut t0, &mut t1);
             }

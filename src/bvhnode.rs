@@ -77,7 +77,7 @@ impl BvhNode {
 }
 
 impl Hitable for BvhNode {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         if self.bbox.hit(r, t_min, t_max) {
             if self.right.is_none() {
                 self.left.hit(&r, t_min, t_max)

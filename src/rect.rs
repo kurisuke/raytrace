@@ -13,24 +13,24 @@ pub struct Rect {
 #[derive(Clone)]
 pub enum Axes {
     XY {
-        x: (f64, f64),
-        y: (f64, f64),
-        z: f64,
+        x: (f32, f32),
+        y: (f32, f32),
+        z: f32,
     },
     XZ {
-        x: (f64, f64),
-        y: f64,
-        z: (f64, f64),
+        x: (f32, f32),
+        y: f32,
+        z: (f32, f32),
     },
     YZ {
-        x: f64,
-        y: (f64, f64),
-        z: (f64, f64),
+        x: f32,
+        y: (f32, f32),
+        z: (f32, f32),
     },
 }
 
 impl Hitable for Rect {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         // check if ray intersects the rect plane
         let t = match self.a {
             Axes::XY { x: _, y: _, z } => (z - r.origin.z()) / r.direction.z(),
@@ -184,7 +184,7 @@ impl Cuboid {
 }
 
 impl Hitable for Cuboid {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         self.faces.hit(r, t_min, t_max)
     }
 

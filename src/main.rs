@@ -75,7 +75,7 @@ fn main() {
         look_at,
         Vec3::new(0.0, 1.0, 0.0),
         40.0,
-        params.nx as f64 / params.ny as f64,
+        params.nx as f32 / params.ny as f32,
         0.1,
         dist_to_focus,
     );
@@ -85,7 +85,7 @@ fn main() {
         Vec3::new(278.0, 278.0, 0.0),
         Vec3::new(0.0, 1.0, 0.0),
         40.0,
-        params.nx as f64 / params.ny as f64,
+        params.nx as f32 / params.ny as f32,
         0.0,
         10.0,
     );
@@ -122,11 +122,11 @@ fn random_scene() -> HitableList {
 
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat: f64 = rng.gen();
+            let choose_mat: f32 = rng.gen();
             let center = Vec3::new(
-                a as f64 + 0.9 * rng.gen::<f64>(),
+                a as f32 + 0.9 * rng.gen::<f32>(),
                 0.2,
-                b as f64 + 0.9 * rng.gen::<f64>(),
+                b as f32 + 0.9 * rng.gen::<f32>(),
             );
             if (center - Vec3::new(4.0, 0.2, 0.0)).len() > 0.9 {
                 if choose_mat < 0.8 {
@@ -137,9 +137,9 @@ fn random_scene() -> HitableList {
                         material: Material::Diffuse {
                             albedo: Texture::Constant {
                                 color: Vec3::new(
-                                    rng.gen::<f64>() * rng.gen::<f64>(),
-                                    rng.gen::<f64>() * rng.gen::<f64>(),
-                                    rng.gen::<f64>() * rng.gen::<f64>(),
+                                    rng.gen::<f32>() * rng.gen::<f32>(),
+                                    rng.gen::<f32>() * rng.gen::<f32>(),
+                                    rng.gen::<f32>() * rng.gen::<f32>(),
                                 ),
                             },
                         },

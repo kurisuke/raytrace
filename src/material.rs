@@ -13,8 +13,8 @@ pub struct Scatter {
 #[derive(Clone)]
 pub enum Material {
     Diffuse { albedo: Texture },
-    Metal { albedo: Vec3, fuzz: f64 },
-    Dielectric { ref_index: f64 },
+    Metal { albedo: Vec3, fuzz: f32 },
+    Dielectric { ref_index: f32 },
     DiffuseLight { emit: Texture },
 }
 
@@ -28,7 +28,7 @@ impl Material {
         }
     }
 
-    pub fn emitted(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
+    pub fn emitted(&self, u: f32, v: f32, p: &Vec3) -> Vec3 {
         match self {
             Material::DiffuseLight { emit } => emit.value(u, v, p),
             _ => Vec3::new(0.0, 0.0, 0.0),
@@ -47,7 +47,7 @@ fn scatter_diffuse(rec: &HitRecord, albedo: &Texture) -> Option<Scatter> {
     })
 }
 
-fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Option<Scatter> {
+fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f32) -> Option<Scatter> {
     let reflected = reflect(r_in.direction.normalize(), rec.n) + fuzz * random_in_unit_sphere();
     if Vec3::dot(reflected, rec.n) > 0.0 {
         Some(Scatter {
@@ -62,7 +62,7 @@ fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Optio
     }
 }
 
-fn scatter_dielectric(r_in: &Ray, rec: &HitRecord, ref_index: f64) -> Option<Scatter> {
+fn scatter_dielectric(r_in: &Ray, rec: &HitRecord, ref_index: f32) -> Option<Scatter> {
     let din = Vec3::dot(r_in.direction, rec.n);
     let outward_normal = if din > 0.0 { -rec.n } else { rec.n };
     let ni_over_nt = if din > 0.0 {
@@ -84,7 +84,7 @@ fn scatter_dielectric(r_in: &Ray, rec: &HitRecord, ref_index: f64) -> Option<Sca
     };
 
     let mut rng = rand::thread_rng();
-    if rng.gen::<f64>() < reflect_prob {
+    if rng.gen::<f32>() < reflect_prob {
         let reflected = reflect(r_in.direction, rec.n);
         Some(Scatter {
             att: Vec3::new(1.0, 1.0, 1.0),
@@ -123,7 +123,7 @@ fn reflect(v: Vec3, n: Vec3) -> Vec3 {
     v.clone() - 2.0 * Vec3::dot(v, n) * n
 }
 
-fn refract(v: Vec3, n: Vec3, ni_over_nt: f64) -> Option<Vec3> {
+fn refract(v: Vec3, n: Vec3, ni_over_nt: f32) -> Option<Vec3> {
     let uv = v.normalize();
     let dt = Vec3::dot(uv, n);
     let d = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
@@ -134,7 +134,7 @@ fn refract(v: Vec3, n: Vec3, ni_over_nt: f64) -> Option<Vec3> {
     }
 }
 
-fn schlick(cosine: f64, ref_index: f64) -> f64 {
+fn schlick(cosine: f32, ref_index: f32) -> f32 {
     let r0 = (1.0 - ref_index) / (1.0 + ref_index);
     let r0 = r0 * r0;
     r0 + (1.0 - r0) * (1.0 - cosine).powi(5)

@@ -7,16 +7,16 @@ use crate::vec3::Vec3;
 use std::ops::{Add, AddAssign};
 
 pub struct HitRecord<'a> {
-    pub t: f64,
+    pub t: f32,
     pub p: Vec3,
     pub n: Vec3,
-    pub u: f64,
-    pub v: f64,
+    pub u: f32,
+    pub v: f32,
     pub material: &'a Material,
 }
 
 pub trait Hitable {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
     fn bounding_box(&self) -> Option<BoundingBox>;
 }
 
@@ -28,7 +28,7 @@ unsafe impl Sync for HitableList {}
 unsafe impl Send for HitableList {}
 
 impl Hitable for HitableList {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut hit_record: Option<HitRecord> = None;
         let mut closest_so_far = t_max;
         for item in &self.list {

@@ -15,7 +15,7 @@ pub enum Texture {
     },
     PerlinNoise {
         perlin: Perlin,
-        scale: f64,
+        scale: f32,
     },
     Image {
         image: RgbImage,
@@ -23,7 +23,7 @@ pub enum Texture {
 }
 
 impl Texture {
-    pub fn value(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
+    pub fn value(&self, u: f32, v: f32, p: &Vec3) -> Vec3 {
         match self {
             Texture::Constant { color } => color.clone(),
             Texture::Checker { odd, even } => {
@@ -61,7 +61,7 @@ impl Perlin {
         }
     }
 
-    pub fn noise(&self, p: &Vec3) -> f64 {
+    pub fn noise(&self, p: &Vec3) -> f32 {
         let u = p.x() - p.x().floor();
         let v = p.y() - p.y().floor();
         let w = p.z() - p.z().floor();
@@ -82,7 +82,7 @@ impl Perlin {
         perlin_interpolate(c, u, v, w)
     }
 
-    pub fn turb(&self, p: &Vec3, depth: usize) -> f64 {
+    pub fn turb(&self, p: &Vec3, depth: usize) -> f32 {
         let mut acc = 0.0;
         let mut temp_p = p.clone();
         let mut weight = 1.0;
@@ -121,7 +121,7 @@ fn perlin_generate_perm() -> [usize; 256] {
     p
 }
 
-fn perlin_interpolate(c: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+fn perlin_interpolate(c: [[[Vec3; 2]; 2]; 2], u: f32, v: f32, w: f32) -> f32 {
     let uu = u * u * (3. - 2. * u);
     let vv = v * v * (3. - 2. * v);
     let ww = w * w * (3. - 2. * w);
@@ -129,10 +129,10 @@ fn perlin_interpolate(c: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
     for i in 0..2 {
         for j in 0..2 {
             for k in 0..2 {
-                let weight_v = Vec3::new(u - i as f64, v - j as f64, w - k as f64);
-                acc += (i as f64 * uu + (1 - i) as f64 * (1.0 - uu))
-                    * (j as f64 * vv + (1 - j) as f64 * (1.0 - vv))
-                    * (k as f64 * ww + (1 - k) as f64 * (1.0 - ww))
+                let weight_v = Vec3::new(u - i as f32, v - j as f32, w - k as f32);
+                acc += (i as f32 * uu + (1 - i) as f32 * (1.0 - uu))
+                    * (j as f32 * vv + (1 - j) as f32 * (1.0 - vv))
+                    * (k as f32 * ww + (1 - k) as f32 * (1.0 - ww))
                     * Vec3::dot(c[i][j][k], weight_v);
             }
         }
@@ -140,9 +140,9 @@ fn perlin_interpolate(c: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
     acc
 }
 
-fn image_texture_value(image: &RgbImage, u: f64, v: f64, _: &Vec3) -> Vec3 {
-    let i = (u * image.width() as f64) as i32;
-    let j = ((1.0 - v) * image.height() as f64 - 0.001) as i32;
+fn image_texture_value(image: &RgbImage, u: f32, v: f32, _: &Vec3) -> Vec3 {
+    let i = (u * image.width() as f32) as i32;
+    let j = ((1.0 - v) * image.height() as f32 - 0.001) as i32;
 
     // boundaries
     let i = if i < 0 { 0 } else { i };
@@ -160,8 +160,8 @@ fn image_texture_value(image: &RgbImage, u: f64, v: f64, _: &Vec3) -> Vec3 {
 
     let pixel = image.get_pixel(i, j);
     Vec3::new(
-        pixel[0] as f64 / 255.0,
-        pixel[1] as f64 / 255.0,
-        pixel[2] as f64 / 255.0,
+        pixel[0] as f32 / 255.0,
+        pixel[1] as f32 / 255.0,
+        pixel[2] as f32 / 255.0,
     )
 }

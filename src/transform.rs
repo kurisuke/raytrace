@@ -15,7 +15,7 @@ impl Translate {
 }
 
 impl Hitable for Translate {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let r_moved = Ray::new(r.origin - self.offset, r.direction);
         if let Some(mut rec) = self.h.hit(&r_moved, t_min, t_max) {
             rec.p += self.offset;
@@ -38,36 +38,36 @@ impl Hitable for Translate {
 }
 
 pub struct RotateY {
-    sin_theta: f64,
-    cos_theta: f64,
+    sin_theta: f32,
+    cos_theta: f32,
     bbox: Option<BoundingBox>,
     h: Box<dyn Hitable>,
 }
 
 impl RotateY {
-    pub fn new(h: Box<dyn Hitable>, angle: f64) -> RotateY {
-        let radians = std::f64::consts::PI / 180.0 * angle;
+    pub fn new(h: Box<dyn Hitable>, angle: f32) -> RotateY {
+        let radians = std::f32::consts::PI / 180.0 * angle;
         let sin_theta = radians.sin();
         let cos_theta = radians.cos();
         let bbox = match h.bounding_box() {
             Some(bbox) => {
-                let mut min = Vec3::new(std::f64::MAX, std::f64::MAX, std::f64::MAX);
-                let mut max = Vec3::new(-std::f64::MAX, -std::f64::MAX, -std::f64::MAX);
+                let mut min = Vec3::new(std::f32::MAX, std::f32::MAX, std::f32::MAX);
+                let mut max = Vec3::new(-std::f32::MAX, -std::f32::MAX, -std::f32::MAX);
                 for i in 0..2 {
                     for j in 0..2 {
                         for k in 0..2 {
-                            let x = i as f64 * bbox.max.x() + (1 - i) as f64 * bbox.min.x();
-                            let y = j as f64 * bbox.max.y() + (1 - j) as f64 * bbox.min.y();
-                            let z = k as f64 * bbox.max.z() + (1 - k) as f64 * bbox.min.z();
+                            let x = i as f32 * bbox.max.x() + (1 - i) as f32 * bbox.min.x();
+                            let y = j as f32 * bbox.max.y() + (1 - j) as f32 * bbox.min.y();
+                            let z = k as f32 * bbox.max.z() + (1 - k) as f32 * bbox.min.z();
                             let x_new = cos_theta * x + sin_theta * z;
                             let z_new = -sin_theta * x + cos_theta * z;
                             let tester = Vec3::new(x_new, y, z_new);
                             for c in 0..3 {
-                                if tester[c] > max[c] {
-                                    max[c] = tester[c];
+                                if tester.i(c) > max.i(c) {
+                                    max.set_i(c, tester.i(c));
                                 }
-                                if tester[c] < min[c] {
-                                    min[c] = tester[c];
+                                if tester.i(c) < min.i(c) {
+                                    min.set_i(c, tester.i(c));
                                 }
                             }
                         }
@@ -87,7 +87,7 @@ impl RotateY {
 }
 
 impl Hitable for RotateY {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let origin = Vec3::new(
             self.cos_theta * r.origin.x() - self.sin_theta * r.origin.z(),
             r.origin.y(),

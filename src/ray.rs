@@ -10,7 +10,7 @@ impl Ray {
         Ray { origin, direction }
     }
 
-    pub fn point(&self, t: f64) -> Vec3 {
+    pub fn point(&self, t: f32) -> Vec3 {
         self.origin + t * self.direction
     }
 }
