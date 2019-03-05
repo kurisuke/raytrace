@@ -62,7 +62,6 @@ fn main() {
             .unwrap_or("64")
             .parse::<usize>()
             .unwrap(),
-        nt: num_cpus::get(),
         filename: String::from("image.png"),
     };
 
