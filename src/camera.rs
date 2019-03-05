@@ -29,8 +29,8 @@ impl Camera {
         let half_width = aspect * half_height;
 
         let w = (look_from - look_at).normalize();
-        let u = Vec3::cross(&vup, &w).normalize();
-        let v = Vec3::cross(&w, &u);
+        let u = Vec3::cross(vup, w).normalize();
+        let v = Vec3::cross(w, u);
 
         Camera {
             origin: look_from,
@@ -75,7 +75,7 @@ fn random_in_unit_disk() -> Vec3 {
     let mut rng = rand::thread_rng();
     loop {
         let p = Vec3::new(rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0), 0.0);
-        if Vec3::dot(&p, &p) < 1.0 {
+        if Vec3::dot(p, p) < 1.0 {
             return p;
         }
     }

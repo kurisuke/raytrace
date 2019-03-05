@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Peter Helbing <peter@abulafia.org>"]
 edition = "2018"
 
+[profile.release]
+lto = true
+codegen-units = 1
+
 [dependencies]
 image = "0.21.0"
 rand = "0.6.5"

@@ -10,38 +10,53 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
+    #[inline(always)]
     pub fn default() -> Vec3 {
         Vec3 { e: [0.0, 0.0, 0.0] }
     }
 
+    #[inline(always)]
     pub fn new(e0: f64, e1: f64, e2: f64) -> Vec3 {
         Vec3 { e: [e0, e1, e2] }
     }
 
+    #[inline(always)]
     pub fn x(&self) -> f64 {
         self.e[0]
     }
+
+    #[inline(always)]
     pub fn y(&self) -> f64 {
         self.e[1]
     }
+
+    #[inline(always)]
     pub fn z(&self) -> f64 {
         self.e[2]
     }
+
+    #[inline(always)]
     pub fn r(&self) -> f64 {
         self.e[0]
     }
+
+    #[inline(always)]
     pub fn g(&self) -> f64 {
         self.e[1]
     }
+
+    #[inline(always)]
     pub fn b(&self) -> f64 {
         self.e[2]
     }
 
-    pub fn dot(v1: &Vec3, v2: &Vec3) -> f64 {
+    #[inline(always)]
+    pub fn dot(v1: Vec3, v2: Vec3) -> f64 {
         v1.e[0] * v2.e[0] + v1.e[1] * v2.e[1] + v1.e[2] * v2.e[2]
     }
 
-    pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
+    #[inline(always)]
+    pub fn cross(v1: Vec3, v2: Vec3) -> Vec3 {
         Vec3 {
             e: [
                 v1.e[1] * v2.e[2] - v1.e[2] * v2.e[1],
@@ -51,14 +66,17 @@ impl Vec3 {
         }
     }
 
+    #[inline(always)]
     pub fn len(&self) -> f64 {
         (self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]).sqrt()
     }
 
+    #[inline(always)]
     pub fn len_squared(&self) -> f64 {
         (self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2])
     }
 
+    #[inline(always)]
     pub fn normalize(&self) -> Vec3 {
         let k = self.len();
         Vec3 {

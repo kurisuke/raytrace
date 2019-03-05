@@ -1,10 +1,7 @@
 use crate::boundingbox;
 use crate::boundingbox::BoundingBox;
-use crate::bvhnode::BvhNode;
 use crate::material::Material;
 use crate::ray::Ray;
-use crate::rect::{Cuboid, Rect};
-use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
 use std::ops::{Add, AddAssign};
@@ -67,9 +64,7 @@ impl Add for HitableList {
     fn add(self, rhs: HitableList) -> HitableList {
         let mut list = self.list;
         list.extend(rhs.list);
-        HitableList {
-            list,
-        }
+        HitableList { list }
     }
 }
 

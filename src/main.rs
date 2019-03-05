@@ -14,7 +14,7 @@ mod vec3;
 use rand::prelude::*;
 
 use crate::camera::Camera;
-use crate::hitable::{Hitable, HitableList};
+use crate::hitable::HitableList;
 use crate::material::Material;
 use crate::rect::{Axes, Cuboid, Rect};
 use crate::render::RenderParams;
@@ -93,7 +93,7 @@ fn main() {
 
     // define the world
     // let world = two_perlin_spheres();
-    let mut world = cornell_box_base() + cornell_box_balls();
+    let world = cornell_box_base() + cornell_box_balls();
     let world = HitableList {
         list: vec![Box::new(bvhnode::BvhNode::new(world.list))],
     };
@@ -364,9 +364,7 @@ fn cornell_box_blocks() -> HitableList {
 }
 
 fn cornell_box_balls() -> HitableList {
-    let glass = Material::Dielectric {
-        ref_index: 1.5,
-    };
+    let glass = Material::Dielectric { ref_index: 1.5 };
     let metal = Material::Metal {
         albedo: Vec3::new(0.7, 0.6, 0.5),
         fuzz: 0.0,

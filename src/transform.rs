@@ -2,7 +2,6 @@ use crate::boundingbox::BoundingBox;
 use crate::hitable::{HitRecord, Hitable};
 use crate::ray::Ray;
 use crate::vec3::Vec3;
-use std::collections::Bound;
 
 pub struct Translate {
     pub offset: Vec3,
@@ -27,7 +26,7 @@ impl Hitable for Translate {
     }
 
     fn bounding_box(&self) -> Option<BoundingBox> {
-        if let Some(mut bbox) = self.h.bounding_box() {
+        if let Some(bbox) = self.h.bounding_box() {
             Some(BoundingBox {
                 min: bbox.min + self.offset,
                 max: bbox.max + self.offset,

@@ -48,8 +48,8 @@ fn scatter_diffuse(rec: &HitRecord, albedo: &Texture) -> Option<Scatter> {
 }
 
 fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Option<Scatter> {
-    let reflected = reflect(&r_in.direction.normalize(), &rec.n) + fuzz * random_in_unit_sphere();
-    if Vec3::dot(&reflected, &rec.n) > 0.0 {
+    let reflected = reflect(r_in.direction.normalize(), rec.n) + fuzz * random_in_unit_sphere();
+    if Vec3::dot(reflected, rec.n) > 0.0 {
         Some(Scatter {
             att: albedo.clone(),
             ray: Ray {
@@ -63,7 +63,7 @@ fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Optio
 }
 
 fn scatter_dielectric(r_in: &Ray, rec: &HitRecord, ref_index: f64) -> Option<Scatter> {
-    let din = Vec3::dot(&r_in.direction, &rec.n);
+    let din = Vec3::dot(r_in.direction, rec.n);
     let outward_normal = if din > 0.0 { -rec.n } else { rec.n };
     let ni_over_nt = if din > 0.0 {
         ref_index
@@ -76,7 +76,7 @@ fn scatter_dielectric(r_in: &Ray, rec: &HitRecord, ref_index: f64) -> Option<Sca
         -din / r_in.direction.len()
     };
 
-    let refracted_opt = refract(&r_in.direction, &outward_normal, ni_over_nt);
+    let refracted_opt = refract(r_in.direction, outward_normal, ni_over_nt);
     let reflect_prob = if refracted_opt.is_some() {
         schlick(cosine, ref_index)
     } else {
@@ -85,7 +85,7 @@ fn scatter_dielectric(r_in: &Ray, rec: &HitRecord, ref_index: f64) -> Option<Sca
 
     let mut rng = rand::thread_rng();
     if rng.gen::<f64>() < reflect_prob {
-        let reflected = reflect(&r_in.direction, &rec.n);
+        let reflected = reflect(r_in.direction, rec.n);
         Some(Scatter {
             att: Vec3::new(1.0, 1.0, 1.0),
             ray: Ray {
@@ -119,16 +119,16 @@ fn random_in_unit_sphere() -> Vec3 {
     }
 }
 
-fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-    v.clone() - 2.0 * Vec3::dot(v, n) * *n
+fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+    v.clone() - 2.0 * Vec3::dot(v, n) * n
 }
 
-fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
+fn refract(v: Vec3, n: Vec3, ni_over_nt: f64) -> Option<Vec3> {
     let uv = v.normalize();
-    let dt = Vec3::dot(&uv, n);
+    let dt = Vec3::dot(uv, n);
     let d = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
     if d > 0.0 {
-        Some(ni_over_nt * (uv - dt * *n) - d.sqrt() * *n)
+        Some(ni_over_nt * (uv - dt * n) - d.sqrt() * n)
     } else {
         None
     }

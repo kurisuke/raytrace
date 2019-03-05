@@ -1,6 +1,7 @@
 use crate::vec3::Vec3;
 
 use image::RgbImage;
+use rand::seq::SliceRandom;
 use rand::Rng;
 
 #[derive(Clone)]
@@ -114,7 +115,7 @@ fn perlin_generate() -> [Vec3; 256] {
 fn perlin_generate_perm() -> [usize; 256] {
     let mut rng = rand::thread_rng();
     let mut v: Vec<usize> = (0..256).collect();
-    rng.shuffle(&mut v);
+    v.shuffle(&mut rng);
     let mut p = [0 as usize; 256];
     p.copy_from_slice(&v);
     p
@@ -132,7 +133,7 @@ fn perlin_interpolate(c: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
                 acc += (i as f64 * uu + (1 - i) as f64 * (1.0 - uu))
                     * (j as f64 * vv + (1 - j) as f64 * (1.0 - vv))
                     * (k as f64 * ww + (1 - k) as f64 * (1.0 - ww))
-                    * Vec3::dot(&c[i][j][k], &weight_v);
+                    * Vec3::dot(c[i][j][k], weight_v);
             }
         }
     }
