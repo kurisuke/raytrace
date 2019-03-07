@@ -154,7 +154,7 @@ fn main() {
             params,
         },
         _ => {
-            panic!("Unknown scene: choose one from (cornell_blocks | cornell_balls | two_spheres | random_scene)");
+            panic!("Unknown scene: choose one from (cornell_blocks | cornell_balls | earth_perlin | random_scene)");
         }
     };
 
