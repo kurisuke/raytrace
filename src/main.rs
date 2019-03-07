@@ -17,7 +17,7 @@ use crate::camera::Camera;
 use crate::hitable::HitableList;
 use crate::material::Material;
 use crate::rect::{Axes, Cuboid, Rect};
-use crate::render::RenderParams;
+use crate::render::{Background, RenderParams, Scene};
 use crate::sphere::Sphere;
 use crate::texture::{Perlin, Texture};
 use crate::transform::{RotateY, Translate};
@@ -29,48 +29,86 @@ fn main() {
         .version("0.1")
         .author("Peter Helbing <peter@abulafia.org>")
         .arg(
-            clap::Arg::with_name("WIDTH")
-                .help("width of the resulting image")
+            clap::Arg::with_name("SCENE")
+                .help("scene to render")
+                .required(true)
                 .index(1),
         )
         .arg(
-            clap::Arg::with_name("HEIGHT")
-                .help("height of the resulting image")
-                .index(2),
+            clap::Arg::with_name("width")
+                .short("w")
+                .long("width")
+                .value_name("W")
+                .help("width of the resulting image")
+                .takes_value(true),
         )
         .arg(
-            clap::Arg::with_name("SPP")
-                .help("samples (rays) per pixel")
-                .index(3),
+            clap::Arg::with_name("height")
+                .short("h")
+                .long("height")
+                .value_name("H")
+                .help("height of the resulting image")
+                .takes_value(true),
+        )
+        .arg(
+            clap::Arg::with_name("samples")
+                .short("s")
+                .long("samples")
+                .value_name("S")
+                .help("number of samples (rays) per pixel")
+                .takes_value(true),
+        )
+        .arg(
+            clap::Arg::with_name("out-filename")
+                .short("o")
+                .long("out-filename")
+                .value_name("FILE")
+                .help("name of the output file")
+                .takes_value(true),
         )
         .get_matches();
 
     // render parameters
     let params = RenderParams {
         nx: clap_matches
-            .value_of("WIDTH")
-            .unwrap_or("200")
+            .value_of("width")
+            .unwrap_or("320")
             .parse::<u32>()
             .unwrap(),
         ny: clap_matches
-            .value_of("HEIGHT")
-            .unwrap_or("100")
+            .value_of("height")
+            .unwrap_or("200")
             .parse::<u32>()
             .unwrap(),
         ns: clap_matches
-            .value_of("SPP")
-            .unwrap_or("64")
+            .value_of("samples")
+            .unwrap_or("256")
             .parse::<usize>()
             .unwrap(),
-        filename: String::from("image.png"),
+        filename: clap_matches
+            .value_of("out-filename")
+            .unwrap_or("image.png")
+            .to_string(),
     };
 
     // define the camera
     let look_from = Vec3::new(13.0, 2.0, 3.0);
     let look_at = Vec3::new(0.0, 0.0, 0.0);
     let dist_to_focus = 10.0;
+    let cam_random_scene = Camera::new(
+        look_from,
+        look_at,
+        Vec3::new(0.0, 1.0, 0.0),
+        20.0,
+        params.nx as f32 / params.ny as f32,
+        0.1,
+        dist_to_focus,
+    );
 
-    let cam = Camera::new(
+    let look_from = Vec3::new(13.0, 2.0, 3.0);
+    let look_at = Vec3::new(0.0, 0.0, 0.0);
+    let dist_to_focus = 10.0;
+    let cam_two_spheres = Camera::new(
         look_from,
         look_at,
         Vec3::new(0.0, 1.0, 0.0),
@@ -90,14 +128,37 @@ fn main() {
         10.0,
     );
 
-    // define the world
-    // let world = two_perlin_spheres();
-    let world = cornell_box_base() + cornell_box_balls();
-    let world = HitableList {
-        list: vec![Box::new(bvhnode::BvhNode::new(world.list))],
+    let scene = match clap_matches.value_of("SCENE").unwrap() {
+        "cornell_blocks" => Scene {
+            world: (cornell_box_base() + cornell_box_blocks()).into_bvh(),
+            cam: cam_cornell,
+            background: Background::Color(Vec3::default()),
+            params,
+        },
+        "cornell_balls" => Scene {
+            world: (cornell_box_base() + cornell_box_balls()).into_bvh(),
+            cam: cam_cornell,
+            background: Background::Color(Vec3::default()),
+            params,
+        },
+        "earth_perlin" => Scene {
+            world: (earth_perlin()).into_bvh(),
+            cam: cam_two_spheres,
+            background: Background::Color(Vec3::default()),
+            params,
+        },
+        "random_scene" => Scene {
+            world: (random_scene()).into_bvh(),
+            cam: cam_random_scene,
+            background: Background::BlendY(Vec3::new(1.0, 1.0, 1.0), Vec3::new(0.5, 0.7, 1.0)),
+            params,
+        },
+        _ => {
+            panic!("Unknown scene: choose one from (cornell_blocks | cornell_balls | two_spheres | random_scene)");
+        }
     };
 
-    render::render(world, cam_cornell, params);
+    render::render(scene);
 }
 
 fn random_scene() -> HitableList {
@@ -196,7 +257,7 @@ fn random_scene() -> HitableList {
     hl
 }
 
-fn two_perlin_spheres() -> HitableList {
+fn earth_perlin() -> HitableList {
     let text1 = Texture::PerlinNoise {
         perlin: Perlin::new(),
         scale: 5.0,

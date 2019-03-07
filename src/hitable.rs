@@ -1,5 +1,6 @@
 use crate::boundingbox;
 use crate::boundingbox::BoundingBox;
+use crate::bvhnode;
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
@@ -26,6 +27,14 @@ pub struct HitableList {
 
 unsafe impl Sync for HitableList {}
 unsafe impl Send for HitableList {}
+
+impl HitableList {
+    pub fn into_bvh(self) -> HitableList {
+        HitableList {
+            list: vec![Box::new(bvhnode::BvhNode::new(self.list))],
+        }
+    }
+}
 
 impl Hitable for HitableList {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {

@@ -47,18 +47,6 @@ impl Camera {
         }
     }
 
-    pub fn default(aspect: f32) -> Camera {
-        Camera::new(
-            Vec3::new(0.0, 0.0, 0.0),
-            Vec3::new(0.0, 0.0, -1.0),
-            Vec3::new(0.0, 1.0, 0.0),
-            90.0,
-            aspect,
-            2.0,
-            1.0,
-        )
-    }
-
     pub fn get_ray(&self, s: f32, t: f32) -> Ray {
         let rd = random_in_unit_disk() * self.lens_radius;
         let offset = rd.x() * self.u + rd.y() * self.v;
