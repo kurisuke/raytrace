@@ -20,7 +20,7 @@ use crate::rect::{Axes, Cuboid, Rect};
 use crate::render::{Background, RenderParams, Scene};
 use crate::sphere::Sphere;
 use crate::texture::{Perlin, Texture};
-use crate::transform::{RotateY, Translate};
+use crate::transform::{RotateXYZ, Translate};
 use crate::vec3::Vec3;
 
 fn main() {
@@ -398,24 +398,24 @@ fn cornell_box_blocks() -> HitableList {
     HitableList {
         list: vec![
             Box::new(Translate::new(
-                Box::new(RotateY::new(
+                Box::new(RotateXYZ::new(
                     Box::new(Cuboid::new(
                         Vec3::default(),
                         Vec3::new(165.0, 165.0, 165.0),
                         white.clone(),
                     )),
-                    -18.0,
+                    Vec3::new(0.0, -18.0, 0.0),
                 )),
                 Vec3::new(130.0, 0.0, 65.0),
             )),
             Box::new(Translate::new(
-                Box::new(RotateY::new(
+                Box::new(RotateXYZ::new(
                     Box::new(Cuboid::new(
                         Vec3::default(),
                         Vec3::new(165.0, 330.0, 165.0),
                         white,
                     )),
-                    15.0,
+                    Vec3::new(0.0, 15.0, 0.0),
                 )),
                 Vec3::new(265.0, 0.0, 295.0),
             )),
