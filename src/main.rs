@@ -259,13 +259,13 @@ fn random_scene() -> HitableList {
 
 fn earth_perlin() -> HitableList {
     let text1 = Texture::PerlinNoise {
-        perlin: Perlin::new(),
+        perlin: Box::new(Perlin::new()),
         scale: 5.0,
     };
 
     let img = image::open("res/earth.jpg").unwrap();
     let text2 = Texture::Image {
-        image: img.as_rgb8().unwrap().clone(),
+        image: Box::new(img.as_rgb8().unwrap().clone()),
     };
 
     HitableList {

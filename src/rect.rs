@@ -33,16 +33,16 @@ impl Hitable for Rect {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         // check if ray intersects the rect plane
         let t = match self.a {
-            Axes::XY { x: _, y: _, z } => (z - r.origin.z()) / r.direction.z(),
-            Axes::XZ { x: _, y, z: _ } => (y - r.origin.y()) / r.direction.y(),
-            Axes::YZ { x, y: _, z: _ } => (x - r.origin.x()) / r.direction.x(),
+            Axes::XY { z, .. } => (z - r.origin.z()) / r.direction.z(),
+            Axes::XZ { y, .. } => (y - r.origin.y()) / r.direction.y(),
+            Axes::YZ { x, .. } => (x - r.origin.x()) / r.direction.x(),
         };
         if t < t_min || t > t_max {
             None
         } else {
             // check if intersect point is in rect calc and the (u, v) coordinates
             let uv = match self.a {
-                Axes::XY { x, y, z: _ } => {
+                Axes::XY { x, y, .. } => {
                     let xt = r.origin.x() + t * r.direction.x();
                     let yt = r.origin.y() + t * r.direction.y();
                     if xt < x.0 || xt > x.1 || yt < y.0 || yt > y.1 {
@@ -51,7 +51,7 @@ impl Hitable for Rect {
                         Some(((xt - x.0) / (x.1 - x.0), (yt - y.0) / (y.1 - y.0)))
                     }
                 }
-                Axes::XZ { x, y: _, z } => {
+                Axes::XZ { x, z, .. } => {
                     let xt = r.origin.x() + t * r.direction.x();
                     let zt = r.origin.z() + t * r.direction.z();
                     if xt < x.0 || xt > x.1 || zt < z.0 || zt > z.1 {
@@ -60,7 +60,7 @@ impl Hitable for Rect {
                         Some(((xt - x.0) / (x.1 - x.0), (zt - z.0) / (z.1 - z.0)))
                     }
                 }
-                Axes::YZ { x: _, y, z } => {
+                Axes::YZ { y, z, .. } => {
                     let yt = r.origin.y() + t * r.direction.y();
                     let zt = r.origin.z() + t * r.direction.z();
                     if yt < y.0 || yt > y.1 || zt < z.0 || zt > z.1 {
@@ -75,9 +75,9 @@ impl Hitable for Rect {
             } else {
                 let (u, v) = uv.unwrap();
                 let n = match self.a {
-                    Axes::XY { x: _, y: _, z: _ } => Vec3::new(0.0, 0.0, 1.0),
-                    Axes::XZ { x: _, y: _, z: _ } => Vec3::new(0.0, 1.0, 0.0),
-                    Axes::YZ { x: _, y: _, z: _ } => Vec3::new(1.0, 0.0, 0.0),
+                    Axes::XY { .. } => Vec3::new(0.0, 0.0, 1.0),
+                    Axes::XZ { .. } => Vec3::new(0.0, 1.0, 0.0),
+                    Axes::YZ { .. } => Vec3::new(1.0, 0.0, 0.0),
                 };
                 let n = if self.flip_normal { -n } else { n };
                 Some(HitRecord {

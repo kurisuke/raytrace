@@ -14,18 +14,18 @@ pub enum Texture {
         even: Box<Texture>,
     },
     PerlinNoise {
-        perlin: Perlin,
+        perlin: Box<Perlin>,
         scale: f32,
     },
     Image {
-        image: RgbImage,
+        image: Box<RgbImage>,
     },
 }
 
 impl Texture {
     pub fn value(&self, u: f32, v: f32, p: &Vec3) -> Vec3 {
         match self {
-            Texture::Constant { color } => color.clone(),
+            Texture::Constant { color } => *color,
             Texture::Checker { odd, even } => {
                 let sines = (10.0 * p.x()).sin() * (10.0 * p.y()).sin() * (10.0 * p.z()).sin();
                 if sines < 0.0 {
@@ -84,7 +84,7 @@ impl Perlin {
 
     pub fn turb(&self, p: &Vec3, depth: usize) -> f32 {
         let mut acc = 0.0;
-        let mut temp_p = p.clone();
+        let mut temp_p = *p;
         let mut weight = 1.0;
         for _ in 0..depth {
             acc += weight * self.noise(&temp_p);
@@ -160,8 +160,8 @@ fn image_texture_value(image: &RgbImage, u: f32, v: f32, _: &Vec3) -> Vec3 {
 
     let pixel = image.get_pixel(i, j);
     Vec3::new(
-        pixel[0] as f32 / 255.0,
-        pixel[1] as f32 / 255.0,
-        pixel[2] as f32 / 255.0,
+        f32::from(pixel[0]) / 255.0,
+        f32::from(pixel[1]) / 255.0,
+        f32::from(pixel[2]) / 255.0,
     )
 }

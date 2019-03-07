@@ -32,7 +32,7 @@ pub struct Scene {
 impl Background {
     pub fn color(&self, r: &Ray) -> Vec3 {
         match self {
-            Background::Color(c) => c.clone(),
+            Background::Color(c) => *c,
             Background::BlendY(c1, c2) => {
                 let unique_direction = r.direction.normalize();
                 let t = 0.5 * (unique_direction.y() + 1.0);
@@ -52,7 +52,7 @@ pub fn render(scene: Scene) {
 
     // let samples_per_thread = params.ns / params.nt;
 
-    let mut pbr = pbr::ProgressBar::new((data.width() * data.height()) as u64);
+    let mut pbr = pbr::ProgressBar::new(u64::from(data.width() * data.height()));
     pbr.show_percent = true;
     pbr.show_time_left = true;
     pbr.show_counter = false;

@@ -24,7 +24,7 @@ impl Material {
             Material::Diffuse { albedo } => scatter_diffuse(rec, &albedo),
             Material::Metal { albedo, fuzz } => scatter_metal(r_in, rec, &albedo, *fuzz),
             Material::Dielectric { ref_index } => scatter_dielectric(r_in, rec, *ref_index),
-            Material::DiffuseLight { emit: _ } => None,
+            Material::DiffuseLight { .. } => None,
         }
     }
 
@@ -51,7 +51,7 @@ fn scatter_metal(r_in: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f32) -> Optio
     let reflected = reflect(r_in.direction.normalize(), rec.n) + fuzz * random_in_unit_sphere();
     if Vec3::dot(reflected, rec.n) > 0.0 {
         Some(Scatter {
-            att: albedo.clone(),
+            att: *albedo,
             ray: Ray {
                 origin: rec.p,
                 direction: reflected,
@@ -120,7 +120,7 @@ fn random_in_unit_sphere() -> Vec3 {
 }
 
 fn reflect(v: Vec3, n: Vec3) -> Vec3 {
-    v.clone() - 2.0 * Vec3::dot(v, n) * n
+    v - 2.0 * Vec3::dot(v, n) * n
 }
 
 fn refract(v: Vec3, n: Vec3, ni_over_nt: f32) -> Option<Vec3> {
