@@ -16,6 +16,7 @@ pub enum Material {
     Metal { albedo: Vec3, fuzz: f32 },
     Dielectric { ref_index: f32 },
     DiffuseLight { emit: Texture },
+    Isotropic { albedo: Texture },
 }
 
 impl Material {
@@ -25,6 +26,7 @@ impl Material {
             Material::Metal { albedo, fuzz } => scatter_metal(r_in, rec, &albedo, *fuzz),
             Material::Dielectric { ref_index } => scatter_dielectric(r_in, rec, *ref_index),
             Material::DiffuseLight { .. } => None,
+            Material::Isotropic { albedo } => scatter_isotropic(rec, &albedo),
         }
     }
 
@@ -102,6 +104,16 @@ fn scatter_dielectric(r_in: &Ray, rec: &HitRecord, ref_index: f32) -> Option<Sca
             },
         })
     }
+}
+
+fn scatter_isotropic(rec: &HitRecord, albedo: &Texture) -> Option<Scatter> {
+    Some(Scatter {
+        att: albedo.value(rec.u, rec.v, &rec.p),
+        ray: Ray {
+            origin: rec.p,
+            direction: random_in_unit_sphere(),
+        },
+    })
 }
 
 fn random_in_unit_sphere() -> Vec3 {

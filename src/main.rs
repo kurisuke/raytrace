@@ -10,6 +10,7 @@ mod sphere;
 mod texture;
 mod transform;
 mod vec3;
+mod volume;
 
 use rand::prelude::*;
 
@@ -22,6 +23,7 @@ use crate::sphere::Sphere;
 use crate::texture::{Perlin, Texture};
 use crate::transform::{RotateXYZ, Translate};
 use crate::vec3::Vec3;
+use crate::volume::ConstantMedium;
 
 fn main() {
     // command line argument
@@ -135,6 +137,12 @@ fn main() {
             background: Background::Color(Vec3::default()),
             params,
         },
+        "cornell_blocks_volume" => Scene {
+            world: (cornell_box_base() + cornell_box_blocks_volume()).into_bvh(),
+            cam: cam_cornell,
+            background: Background::Color(Vec3::default()),
+            params,
+        },
         "cornell_balls" => Scene {
             world: (cornell_box_base() + cornell_box_balls()).into_bvh(),
             cam: cam_cornell,
@@ -154,7 +162,7 @@ fn main() {
             params,
         },
         _ => {
-            panic!("Unknown scene: choose one from (cornell_blocks | cornell_balls | earth_perlin | random_scene)");
+            panic!("Unknown scene: choose one from (cornell_blocks | cornell_blocks_volume | cornell_balls | earth_perlin | random_scene)");
         }
     };
 
@@ -418,6 +426,56 @@ fn cornell_box_blocks() -> HitableList {
                     Vec3::new(0.0, 15.0, 0.0),
                 )),
                 Vec3::new(265.0, 0.0, 295.0),
+            )),
+        ],
+    }
+}
+
+fn cornell_box_blocks_volume() -> HitableList {
+    let white = Material::Diffuse {
+        albedo: Texture::Constant {
+            color: Vec3::new(0.73, 0.73, 0.73),
+        },
+    };
+
+    let b1 = Box::new(Translate::new(
+        Box::new(RotateXYZ::new(
+            Box::new(Cuboid::new(
+                Vec3::default(),
+                Vec3::new(165.0, 165.0, 165.0),
+                white.clone(),
+            )),
+            Vec3::new(0.0, -18.0, 0.0),
+        )),
+        Vec3::new(130.0, 0.0, 65.0),
+    ));
+    let b2 = Box::new(Translate::new(
+        Box::new(RotateXYZ::new(
+            Box::new(Cuboid::new(
+                Vec3::default(),
+                Vec3::new(165.0, 330.0, 165.0),
+                white,
+            )),
+            Vec3::new(0.0, 15.0, 0.0),
+        )),
+        Vec3::new(265.0, 0.0, 295.0),
+    ));
+
+    HitableList {
+        list: vec![
+            Box::new(ConstantMedium::new(
+                b1,
+                0.01,
+                Texture::Constant {
+                    color: Vec3::new(1.0, 1.0, 1.0),
+                },
+            )),
+            Box::new(ConstantMedium::new(
+                b2,
+                0.01,
+                Texture::Constant {
+                    color: Vec3::new(0.0, 0.0, 0.0),
+                },
             )),
         ],
     }
