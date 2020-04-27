@@ -70,10 +70,7 @@ impl Hitable for Rect {
                     }
                 }
             };
-            if uv.is_none() {
-                None
-            } else {
-                let (u, v) = uv.unwrap();
+            if let Some((u, v)) = uv {
                 let n = match self.a {
                     Axes::XY { .. } => Vec3::new(0.0, 0.0, 1.0),
                     Axes::XZ { .. } => Vec3::new(0.0, 1.0, 0.0),
@@ -88,6 +85,8 @@ impl Hitable for Rect {
                     v,
                     material: &self.material,
                 })
+            } else {
+                None
             }
         }
     }

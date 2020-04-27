@@ -390,7 +390,7 @@ fn cornell_box_base() -> HitableList {
                     z: 555.0,
                 },
                 flip_normal: true,
-                material: white.clone(),
+                material: white,
             }),
         ],
     }
