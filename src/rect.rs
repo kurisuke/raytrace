@@ -113,7 +113,7 @@ impl Hitable for Rect {
 pub struct Cuboid {
     p_min: Vec3,
     p_max: Vec3,
-    faces: Box<Hitable>,
+    faces: Box<dyn Hitable>,
 }
 
 impl Cuboid {

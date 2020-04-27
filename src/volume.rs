@@ -8,13 +8,13 @@ use crate::vec3::Vec3;
 use rand::Rng;
 
 pub struct ConstantMedium {
-    pub boundary: Box<Hitable>,
+    pub boundary: Box<dyn Hitable>,
     pub density: f32,
     pub phase_function: Box<Material>,
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: Box<Hitable>, density: f32, albedo: Texture) -> ConstantMedium {
+    pub fn new(boundary: Box<dyn Hitable>, density: f32, albedo: Texture) -> ConstantMedium {
         ConstantMedium {
             boundary,
             density,

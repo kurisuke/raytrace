@@ -106,7 +106,7 @@ impl Vec3 {
 
     #[inline]
     pub fn len_squared(self) -> f32 {
-        (self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2])
+        self.e[0] * self.e[0] + self.e[1] * self.e[1] + self.e[2] * self.e[2]
     }
 
     #[inline]

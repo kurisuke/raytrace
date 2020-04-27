@@ -6,8 +6,8 @@ use crate::ray::Ray;
 use rand::Rng;
 
 pub struct BvhNode {
-    left: Box<Hitable>,
-    right: Option<Box<Hitable>>,
+    left: Box<dyn Hitable>,
+    right: Option<Box<dyn Hitable>>,
     bbox: BoundingBox,
 }
 

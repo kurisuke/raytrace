@@ -62,17 +62,17 @@ impl Vec3 {
     }
 
     #[inline]
-    fn yzx(self) -> Vec3 {
+    pub fn yzx(self) -> Vec3 {
         unsafe { Vec3(_mm_shuffle_ps(self.0, self.0, 0b00_00_10_01)) }
     }
 
     #[inline]
-    fn zxy(self) -> Vec3 {
+    pub fn zxy(self) -> Vec3 {
         unsafe { Vec3(_mm_shuffle_ps(self.0, self.0, 0b01_01_00_10)) }
     }
 
     #[inline]
-    fn sum(self) -> f32 {
+    pub fn sum(self) -> f32 {
         self.x() + self.y() + self.z()
     }
 
